@@ -74,9 +74,8 @@ public class AmazonSellingPartnerSdk {
         var basicAWSCredentials = new BasicAWSCredentials(accessCredentials.getAccessKeyId(), accessCredentials.getSecretAccessKey());
         var credentialsProvider =  new STSAssumeRoleSessionCredentialsProvider.Builder(accessCredentials.getRoleArn(),
                 "rakesh")
-                .withStsClient((AWSSecurityTokenService)((AWSSecurityTokenServiceClientBuilder)((AWSSecurityTokenServiceClientBuilder)
-                        AWSSecurityTokenServiceClientBuilder.standard().withRegion(accessCredentials.getRegion())).
-                        withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials))).build()).build();
+                .withStsClient(AWSSecurityTokenServiceClientBuilder.standard().withRegion(accessCredentials.getRegion()).
+                        withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials)).build()).build();
 
 
         AWS4Signer signer = new AWS4Signer();
