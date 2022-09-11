@@ -7,7 +7,8 @@
     <groupId>io.github.dftrakesh</groupId>
     <artifactId>amazon-sp-api</artifactId>
     <version>1.0-SNAPSHOT</version>
-	
+    <packaging>jar</packaging>
+
 	<name>amazon-sp-api</name>
     <description>Amazon SP API using JDK 11 and Reactive Programming</description>
     <url>https://github.com/dftrakesh/amazon-sp-api</url>
