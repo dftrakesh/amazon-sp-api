@@ -124,6 +124,7 @@
         </plugins>
     </build>
 
+
     <distributionManagement>
         <downloadUrl>https://github.com/arey/spring-batch-toolkit</downloadUrl>
         <snapshotRepository>
