@@ -29,6 +29,8 @@ public interface ConstantCodes {
     String HTTP_HEADER_VALUE_APPLICATION_FORM_URL_ENCODED = "application/x-www-form-urlencoded";
 
     String SELLERS_API_V1 = "/sellers/v1/marketplaceParticipations";
+    String CREATE_REPORT_API_V202106 = "/reports/2021-06-30/reports";
+
     String LWA_AUTHORIZATION_SERVER = "https://api.amazon.com/auth/o2/token";
 
     String AWS_REGION_US_EAST_1 = "us-east-1";

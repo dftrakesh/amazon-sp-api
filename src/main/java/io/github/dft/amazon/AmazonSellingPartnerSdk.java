@@ -1,38 +1,36 @@
 package io.github.dft.amazon;
 
-import com.amazon.SellingPartnerAPIAA.AWSAuthenticationCredentials;
-import com.amazon.SellingPartnerAPIAA.AWSAuthenticationCredentialsProvider;
-import com.amazon.SellingPartnerAPIAA.AWSSigV4Signer;
 import com.amazonaws.DefaultRequest;
 import com.amazonaws.auth.AWS4Signer;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.STSAssumeRoleSessionCredentialsProvider;
 import com.amazonaws.http.HttpMethodName;
-import com.amazonaws.services.securitytoken.AWSSecurityTokenService;
 import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceClientBuilder;
-import com.sun.net.httpserver.Headers;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.dft.amazon.constantcode.ConstantCodes;
 import io.github.dft.amazon.model.AccessCredentials;
 import io.github.dft.amazon.model.auth.AccessTokenResponse;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
+import io.github.dft.amazon.model.reports.v202106.CreateReportResponse;
+import io.github.dft.amazon.model.reports.v202106.CreateReportSpecification;
 import io.github.dft.amazon.model.sellersapi.v1.GetMarketplaceParticipationsResponse;
 import lombok.SneakyThrows;
 
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
-import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 public class AmazonSellingPartnerSdk {
 
-    private AccessCredentials accessCredentials;
+    private final AccessCredentials accessCredentials;
     private String sellingRegionEndpoint;
 
     @SneakyThrows
@@ -47,6 +45,7 @@ public class AmazonSellingPartnerSdk {
         } else if (ConstantCodes.AWS_REGION_US_WEST_1.equalsIgnoreCase(accessCredentials.getRegion())) {
             sellingRegionEndpoint = "https://sellingpartnerapi-fe.amazon.com";
         }
+
     }
 
     @SneakyThrows
@@ -68,7 +67,33 @@ public class AmazonSellingPartnerSdk {
                 .body();
     }
 
+    @SneakyThrows
+    public CreateReportResponse createReport(CreateReportSpecification body) {
+        var objectMapper = new ObjectMapper();
+        String requestBody = objectMapper.writeValueAsString(body);
+
+        final var signRequest = signRequest(ConstantCodes.CREATE_REPORT_API_V202106, HttpMethodName.POST, null, requestBody);
+
+        HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.CREATE_REPORT_API_V202106))
+                .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+                .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+                .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
+                .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
+                .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
+                .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
+
+        return HttpClient.newHttpClient()
+                .send(request, new JsonBodyHandler<>(CreateReportResponse.class))
+                .body();
+    }
+
     private DefaultRequest<Object> signRequest(String resourcePath, HttpMethodName httpMethodName, Map<String, String> params) {
+        return signRequest(resourcePath, httpMethodName, params, null);
+    }
+
+    private DefaultRequest<Object> signRequest(String resourcePath, HttpMethodName httpMethodName, Map<String, String> params, String payload) {
 
         var basicAWSCredentials = new BasicAWSCredentials(accessCredentials.getAccessKeyId(), accessCredentials.getSecretAccessKey());
         var credentialsProvider =  new STSAssumeRoleSessionCredentialsProvider.Builder(accessCredentials.getRoleArn(),
@@ -91,6 +116,10 @@ public class AmazonSellingPartnerSdk {
         }
 
         request.setHttpMethod(httpMethodName);
+        if (null != payload) {
+            request.setContent(new ByteArrayInputStream(payload.getBytes(UTF_8)));
+        }
+
         signer.sign(request, credentialsProvider.getCredentials());
         return request;
     }
