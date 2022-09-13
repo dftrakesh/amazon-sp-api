@@ -47,7 +47,6 @@ public class AmazonSellingPartnerSdk {
         } else if (ConstantCodes.AWS_REGION_US_WEST_1.equalsIgnoreCase(accessCredentials.getRegion())) {
             sellingRegionEndpoint = "https://sellingpartnerapi-fe.amazon.com";
         }
-
     }
 
     @SneakyThrows
