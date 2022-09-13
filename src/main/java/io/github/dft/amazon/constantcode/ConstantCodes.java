@@ -1,11 +1,5 @@
 package io.github.dft.amazon.constantcode;
 
-import lombok.SneakyThrows;
-
-import java.net.URI;
-import java.util.AbstractMap;
-import java.util.Map;
-
 public interface ConstantCodes {
 
     String HTTP_METHOD_GET = "GET";
@@ -37,4 +31,6 @@ public interface ConstantCodes {
 
     String SERVICE_NAME = "execute-api";
     String X_AMZ_DATE = "X-Amz-Date" ;
+
+    String TOKENS_API_V202103 = "/tokens/2021-03-01/restrictedDataToken";
 }
