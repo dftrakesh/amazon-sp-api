@@ -2,12 +2,6 @@ package io.github.dft.amazon.constantcode;
 
 public interface ConstantCodes {
 
-    String HTTP_METHOD_GET = "GET";
-    String HTTP_METHOD_POST = "POST";
-    String HTTP_METHOD_PUT = "PUT";
-    String HTTP_METHOD_DELETE = "DELETE";
-    String HTTP_METHOD_PATCH = "PATCH";
-
     String HTTP_OAUTH_PARAMETER_GRANT_TYPE = "grant_type";
     String HTTP_OAUTH_PARAMETER_REFRESH_TOKEN = "refresh_token";
     String HTTP_OAUTH_PARAMETER_CLIENT_ID = "client_id";
@@ -23,6 +17,9 @@ public interface ConstantCodes {
     String HTTP_HEADER_VALUE_APPLICATION_FORM_URL_ENCODED = "application/x-www-form-urlencoded";
 
     String SELLERS_API_V1 = "/sellers/v1/marketplaceParticipations";
+    String CREATE_REPORT_API_V202106 = "/reports/2021-06-30/reports";
+    String ORDERS_API_V0 = "/orders/v0/orders";
+
     String LWA_AUTHORIZATION_SERVER = "https://api.amazon.com/auth/o2/token";
 
     String AWS_REGION_US_EAST_1 = "us-east-1";
