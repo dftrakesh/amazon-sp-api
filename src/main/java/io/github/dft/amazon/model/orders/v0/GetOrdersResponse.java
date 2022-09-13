@@ -1,10 +1,11 @@
 package io.github.dft.amazon.model.orders.v0;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-import java.util.List;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GetOrdersResponse {
 
-    private List<OrdersList> payload;
+    private OrdersPayload payload;
 }

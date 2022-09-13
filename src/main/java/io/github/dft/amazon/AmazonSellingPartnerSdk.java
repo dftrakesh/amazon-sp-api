@@ -30,70 +30,32 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class AmazonSellingPartnerSdk {
 
-    private final AccessCredentials accessCredentials;
-    private String sellingRegionEndpoint;
+    protected final AccessCredentials accessCredentials;
+    protected final String sellingRegionEndpoint;
+    private final ObjectMapper objectMapper;
 
     @SneakyThrows
     public AmazonSellingPartnerSdk(AccessCredentials accessCredentials) {
         this.accessCredentials = accessCredentials;
         if (ConstantCodes.AWS_REGION_EU_WEST_1.equalsIgnoreCase(accessCredentials.getRegion())) {
-            sellingRegionEndpoint = "https://sellingpartnerapi-eu.amazon.com";
+            this.sellingRegionEndpoint = "https://sellingpartnerapi-eu.amazon.com";
 
         } else if (ConstantCodes.AWS_REGION_US_EAST_1.equalsIgnoreCase(accessCredentials.getRegion())) {
-            sellingRegionEndpoint = "https://sellingpartnerapi-na.amazon.com";
+            this.sellingRegionEndpoint = "https://sellingpartnerapi-na.amazon.com";
 
         } else if (ConstantCodes.AWS_REGION_US_WEST_1.equalsIgnoreCase(accessCredentials.getRegion())) {
-            sellingRegionEndpoint = "https://sellingpartnerapi-fe.amazon.com";
+            this.sellingRegionEndpoint = "https://sellingpartnerapi-fe.amazon.com";
+        } else {
+            this.sellingRegionEndpoint = null;
         }
-
+        this.objectMapper = new ObjectMapper();
     }
 
-    @SneakyThrows
-    public GetMarketplaceParticipationsResponse getMarketplaceParticipations() {
-
-        final var signRequest = signRequest(ConstantCodes.SELLERS_API_V1, HttpMethodName.GET, null);
-
-        HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.SELLERS_API_V1))
-                .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
-                .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
-                .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
-                .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
-                .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
-                .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
-                .build();
-
-        return HttpClient.newHttpClient()
-                .send(request, new JsonBodyHandler<>(GetMarketplaceParticipationsResponse.class))
-                .body();
-    }
-
-    @SneakyThrows
-    public CreateReportResponse createReport(CreateReportSpecification body) {
-        var objectMapper = new ObjectMapper();
-        String requestBody = objectMapper.writeValueAsString(body);
-
-        final var signRequest = signRequest(ConstantCodes.CREATE_REPORT_API_V202106, HttpMethodName.POST, null, requestBody);
-
-        HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.CREATE_REPORT_API_V202106))
-                .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
-                .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
-                .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
-                .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
-                .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
-                .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                .build();
-
-        return HttpClient.newHttpClient()
-                .send(request, new JsonBodyHandler<>(CreateReportResponse.class))
-                .body();
-    }
-
-    private DefaultRequest<Object> signRequest(String resourcePath, HttpMethodName httpMethodName, Map<String, String> params) {
+    protected DefaultRequest<Object> signRequest(String resourcePath, HttpMethodName httpMethodName, Map<String, String> params) {
         return signRequest(resourcePath, httpMethodName, params, null);
     }
 
-    private DefaultRequest<Object> signRequest(String resourcePath, HttpMethodName httpMethodName, Map<String, String> params, String payload) {
+    protected DefaultRequest<Object> signRequest(String resourcePath, HttpMethodName httpMethodName, Map<String, String> params, String payload) {
 
         var basicAWSCredentials = new BasicAWSCredentials(accessCredentials.getAccessKeyId(), accessCredentials.getSecretAccessKey());
         var credentialsProvider =  new STSAssumeRoleSessionCredentialsProvider.Builder(accessCredentials.getRoleArn(),
@@ -160,5 +122,10 @@ public class AmazonSellingPartnerSdk {
             builder.append(URLEncoder.encode(entry.getValue().toString(), StandardCharsets.UTF_8));
         }
         return HttpRequest.BodyPublishers.ofString(builder.toString());
+    }
+
+    @SneakyThrows
+    protected String getString(Object body) {
+        return objectMapper.writeValueAsString(body);
     }
 }
