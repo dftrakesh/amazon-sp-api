@@ -28,4 +28,6 @@ public interface ConstantCodes {
 
     String SERVICE_NAME = "execute-api";
     String X_AMZ_DATE = "X-Amz-Date" ;
+
+    String TOKENS_API_V202103 = "/tokens/2021-03-01/restrictedDataToken";
 }
