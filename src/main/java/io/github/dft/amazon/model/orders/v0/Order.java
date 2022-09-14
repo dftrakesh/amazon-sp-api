@@ -20,11 +20,11 @@ public class Order {
     @JsonProperty("LastUpdateDate")
     private String lastUpdateDate;
 
-    //@JsonProperty("OrderStatus")
-    //private OrderStatusEnum orderStatus;
+    @JsonProperty("OrderStatus")
+    private String orderStatus;
 
     @JsonProperty("FulfillmentChannel")
-    private FulfillmentChannelEnum fulfillmentChannel;
+    private String fulfillmentChannel;
 
     @JsonProperty("SalesChannel")
     private String salesChannel;
@@ -44,14 +44,14 @@ public class Order {
     @JsonProperty("NumberOfItemsUnshipped")
     private Integer numberOfItemsUnshipped;
 
-    //@JsonProperty("PaymentExecutionDetail")
-    //private PaymentExecutionDetailItemList paymentExecutionDetail;
+    @JsonProperty("PaymentExecutionDetailItemList")
+    private PaymentExecutionDetailItemList PaymentExecutionDetailItemList;
 
     @JsonProperty("PaymentMethod")
-    private PaymentMethodEnum paymentMethod;
+    private String paymentMethod;
 
-    //@JsonProperty("PaymentMethodDetails")
-    //private PaymentMethodDetailItemList paymentMethodDetails;
+    @JsonProperty("PaymentMethodDetailItemList")
+    private PaymentMethodDetailItemList paymentMethodDetails;
 
     @JsonProperty("MarketplaceId")
     private String marketplaceId;
@@ -60,13 +60,13 @@ public class Order {
     private String shipmentServiceLevelCategory;
 
     @JsonProperty("EasyShipShipmentStatus")
-    private EasyShipShipmentStatusEnum easyShipShipmentStatus;
+    private String easyShipShipmentStatus;
 
     @JsonProperty("CbaDisplayableShippingLabel")
     private String cbaDisplayableShippingLabel;
 
     @JsonProperty("OrderType")
-    private OrderTypeEnum orderType;
+    private String orderType;
 
     @JsonProperty("EarliestShipDate")
     private String earliestShipDate;
@@ -114,7 +114,7 @@ public class Order {
     private Address defaultShipFromLocationAddress;
 
     @JsonProperty("BuyerInvoicePreference")
-    private BuyerInvoicePreferenceEnum buyerInvoicePreference;
+    private String buyerInvoicePreference;
 
     @JsonProperty("BuyerTaxInformation")
     private BuyerTaxInformation buyerTaxInformation;
@@ -147,34 +147,5 @@ public class Order {
     private Boolean hasRegulatedItems;
 
     @JsonProperty("ElectronicInvoiceStatus")
-    private ElectronicInvoiceStatus electronicInvoiceStatus;
-
-    private enum OrderStatusEnum {
-        Pending, Unshipped, PartiallyShipped, Shipped, Unfulfillable, InvoiceUnconfirmed, PendingAvailability
-    }
-
-    private enum FulfillmentChannelEnum {
-        MFN, AFN
-    }
-
-    private enum PaymentMethodEnum {
-        COD, CVS, Other
-    }
-
-    private enum OrderTypeEnum {
-        StandardOrder, LongLeadTimeOrder, Preorder, BackOrder, SourcingOnDemandOrder
-    }
-
-    private enum EasyShipShipmentStatusEnum {
-        PendingSchedule, PendingPickUp, PendingDropOff, LabelCanceled, PickedUp, DroppedOff, AtOriginFC, AtDestinationFC, Delivered,
-        RejectedByBuyer, Undeliverable, ReturningToSeller, ReturnedToSeller, Lost, OutForDelivery, Damaged
-    }
-
-    private enum BuyerInvoicePreferenceEnum {
-        INDIVIDUAL, BUSINESS
-    }
-
-    private enum ElectronicInvoiceStatus {
-        NotRequired, NotFound, Processing, Errored, Accepted
-    }
+    private String electronicInvoiceStatus;
 }
