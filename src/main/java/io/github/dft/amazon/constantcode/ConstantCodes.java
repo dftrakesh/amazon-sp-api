@@ -21,6 +21,9 @@ public interface ConstantCodes {
     String REPORT_DOCUMENTS_API_V202106 = "/reports/2021-06-30/documents";
     String REPORT_SCHEDULES_API_V202106 = "/reports/2021-06-30/schedules";
     String ORDERS_API_V0 = "/orders/v0/orders";
+    String ORDER_API_V0 = "/orders/v0/orders/{orderId}";
+    String ORDER_BUYER_INFO_API_V0 = "/orders/v0/orders/{orderId}/buyerInfo";
+    String ORDER_ADDRESS_API_V0 = "/orders/v0/orders/{orderId}/address";
 
     String LWA_AUTHORIZATION_SERVER = "https://api.amazon.com/auth/o2/token";
 
