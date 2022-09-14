@@ -8,6 +8,7 @@ import io.github.dft.amazon.model.reports.v202106.CreateReportResponse;
 import io.github.dft.amazon.model.reports.v202106.CreateReportSpecification;
 import io.github.dft.amazon.model.reports.v202106.GetReportsResponse;
 import io.github.dft.amazon.model.reports.v202106.Report;
+import io.github.dft.amazon.model.reports.v202106.ReportDocument;
 import lombok.SneakyThrows;
 import org.apache.http.client.utils.URIBuilder;
 
@@ -24,17 +25,17 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
     }
 
     @SneakyThrows
-    public CreateReportResponse createReport(CreateReportSpecification body) {
-        String requestBody = getString(body);
+    public CreateReportResponse createReport(CreateReportSpecification createReportSpecification) {
+        String requestBody = getString(createReportSpecification);
 
         final var signRequest = signRequest(
-            ConstantCodes.CREATE_REPORT_API_V202106,
+            ConstantCodes.REPORTS_API_V202106,
             HttpMethodName.POST,
             null,
             requestBody
         );
 
-        HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.CREATE_REPORT_API_V202106))
+        HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.REPORTS_API_V202106))
             .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
             .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
             .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
@@ -53,13 +54,13 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
     public Report getReport(String reportId) {
 
         final var signRequest = signRequest(
-            ConstantCodes.CREATE_REPORT_API_V202106.concat("/").concat(reportId),
+            ConstantCodes.REPORTS_API_V202106.concat("/").concat(reportId),
             HttpMethodName.GET,
             null,
             null
         );
 
-        HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.CREATE_REPORT_API_V202106.concat("/").concat(reportId)))
+        HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.REPORTS_API_V202106.concat("/").concat(reportId)))
             .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
             .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
             .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
@@ -74,11 +75,39 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
     }
 
     @SneakyThrows
+    public ReportDocument getReportDocument(String reportDocumentId) {
+
+        final var signRequest = signRequest(
+            ConstantCodes.REPORT_DOCUMENTS_API_V202106.concat("/").concat(reportDocumentId),
+            HttpMethodName.GET,
+            null,
+            null
+        );
+
+        HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.REPORT_DOCUMENTS_API_V202106.concat("/").concat(reportDocumentId)))
+            .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+            .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+            .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
+            .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
+            .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
+            .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
+            .build();
+
+        return HttpClient.newHttpClient()
+            .send(request, new JsonBodyHandler<>(ReportDocument.class))
+            .body();
+    }
+
+    @SneakyThrows
     public GetReportsResponse getReports(HashMap<String, String> params) {
+        final var signRequest = signRequest(
+            ConstantCodes.REPORTS_API_V202106,
+            HttpMethodName.GET,
+            params,
+            null
+        );
 
-        final var signRequest = signRequest(ConstantCodes.CREATE_REPORT_API_V202106, HttpMethodName.GET, params, null);
-
-        URIBuilder uriBuilder = new URIBuilder(sellingRegionEndpoint + ConstantCodes.CREATE_REPORT_API_V202106);
+        URIBuilder uriBuilder = new URIBuilder(sellingRegionEndpoint + ConstantCodes.REPORTS_API_V202106);
         for (String key : params.keySet()) {
             uriBuilder.addParameter(key, params.get(key));
         }

@@ -13,7 +13,7 @@ public class Report {
     private String dataStartTime;
     private String dataEndTime;
     private String reportScheduleId;
-    private ProcessingStatus processingStatus;
+    private String processingStatus;
     private String createdTime;
     private String processingStartTime;
     private String processingEndTime;
