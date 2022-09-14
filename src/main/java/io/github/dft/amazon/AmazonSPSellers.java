@@ -4,11 +4,8 @@ import com.amazonaws.http.HttpMethodName;
 import io.github.dft.amazon.constantcode.ConstantCodes;
 import io.github.dft.amazon.model.AccessCredentials;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
-import io.github.dft.amazon.model.reports.v202106.CreateReportResponse;
-import io.github.dft.amazon.model.reports.v202106.CreateReportSpecification;
 import io.github.dft.amazon.model.sellersapi.v1.GetMarketplaceParticipationsResponse;
 import lombok.SneakyThrows;
-
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
