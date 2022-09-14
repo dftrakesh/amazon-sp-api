@@ -5,6 +5,8 @@ import java.util.List;
 
 @Data
 public class GetReportsResponse {
+
     private List<Report> reports;
     private String nextToken;
+    private List<Error> errors;
 }

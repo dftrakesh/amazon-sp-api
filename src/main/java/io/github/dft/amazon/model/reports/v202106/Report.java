@@ -18,4 +18,5 @@ public class Report {
     private String processingStartTime;
     private String processingEndTime;
     private String reportDocumentId;
+    private List<Error> errors;
 }
