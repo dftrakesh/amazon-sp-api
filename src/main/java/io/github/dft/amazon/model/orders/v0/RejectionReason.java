@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GetOrderAddressResponse {
+public class RejectionReason {
 
-    private OrderAddress payload;
+    @JsonProperty("RejectionReasonId")
+    private String rejectionReasonId;
 
-    private List<Error> errors;
+    @JsonProperty("RejectionReasonDescription")
+    private String rejectionReasonDescription;
 }

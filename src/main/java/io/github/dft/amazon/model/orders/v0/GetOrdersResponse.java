@@ -11,7 +11,6 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GetOrdersResponse {
 
-    @JsonProperty("payload")
     private OrdersPayload payload;
 
     private List<Error> errors;
