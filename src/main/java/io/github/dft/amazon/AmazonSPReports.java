@@ -18,6 +18,7 @@ import org.apache.http.client.utils.URIBuilder;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.HashMap;
 
 public class AmazonSPReports extends AmazonSellingPartnerSdk {
@@ -197,8 +198,31 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN)).header(ConstantCodes.X_AMZ_DATE,
             signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE)).build();
 
-        return HttpClient.newHttpClient().send(request, new JsonBodyHandler<>(ReportScheduleList.class)).body();
+        return HttpClient.newHttpClient()
+            .send(request, new JsonBodyHandler<>(ReportScheduleList.class))
+            .body();
     }
 
+    @SneakyThrows
+    public Void cancelReportSchedule(String reportScheduleId) {
 
-}
+        final var signRequest = signRequest(ConstantCodes.REPORT_SCHEDULES_API_V202106.concat("/").concat(
+            reportScheduleId), HttpMethodName.DELETE, null, null);
+
+        HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.REPORT_SCHEDULES_API_V202106
+                .concat("/").concat(reportScheduleId)))
+            .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+            .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+            .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
+            .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
+            .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
+            .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
+            .DELETE()
+            .build();
+
+        return HttpClient.newHttpClient()
+            .send(request, HttpResponse.BodyHandlers.discarding())
+            .body();
+    }
+};
+
