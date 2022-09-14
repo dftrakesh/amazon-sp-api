@@ -15,6 +15,7 @@ import io.github.dft.amazon.model.reports.v202106.ReportSchedule;
 import io.github.dft.amazon.model.reports.v202106.ReportScheduleList;
 import lombok.SneakyThrows;
 import org.apache.http.client.utils.URIBuilder;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -71,6 +72,7 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
             .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
             .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
+            .GET()
             .build();
 
         return HttpClient.newHttpClient()
@@ -95,6 +97,7 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
             .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
             .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
+            .GET()
             .build();
 
         return HttpClient.newHttpClient()
@@ -117,7 +120,6 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
         }
 
         URI uri = uriBuilder.build();
-
         HttpRequest request = HttpRequest.newBuilder(uri)
             .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
             .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
@@ -125,10 +127,36 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
             .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
             .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
+            .GET()
             .build();
 
         return HttpClient.newHttpClient()
             .send(request, new JsonBodyHandler<>(GetReportsResponse.class))
+            .body();
+    }
+
+    @SneakyThrows
+    public Void cancelReport(String reportId) {
+
+        final var signRequest = signRequest(
+            ConstantCodes.REPORTS_API_V202106.concat("/").concat(reportId),
+            HttpMethodName.DELETE,
+            null,
+            null
+        );
+
+        HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.REPORTS_API_V202106.concat("/").concat(reportId)))
+            .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+            .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+            .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
+            .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
+            .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
+            .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
+            .DELETE()
+            .build();
+
+        return HttpClient.newHttpClient()
+            .send(request, HttpResponse.BodyHandlers.discarding())
             .body();
     }
 
@@ -189,7 +217,6 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
         }
 
         URI uri = uriBuilder.build();
-
         HttpRequest request = HttpRequest.newBuilder(uri).header(ConstantCodes.HTTP_HEADER_ACCEPTS,
             ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON).header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE,
             ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON).header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN,
@@ -224,5 +251,4 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .send(request, HttpResponse.BodyHandlers.discarding())
             .body();
     }
-};
-
+}
