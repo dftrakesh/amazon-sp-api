@@ -4,6 +4,7 @@ import com.amazonaws.http.HttpMethodName;
 import io.github.dft.amazon.constantcode.ConstantCodes;
 import io.github.dft.amazon.model.AccessCredentials;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
+import io.github.dft.amazon.model.reports.v202106.CancelResponse;
 import io.github.dft.amazon.model.reports.v202106.CreateReportResponse;
 import io.github.dft.amazon.model.reports.v202106.CreateReportScheduleResponse;
 import io.github.dft.amazon.model.reports.v202106.CreateReportScheduleSpecification;
@@ -14,6 +15,7 @@ import io.github.dft.amazon.model.reports.v202106.ReportDocument;
 import io.github.dft.amazon.model.reports.v202106.ReportSchedule;
 import io.github.dft.amazon.model.reports.v202106.ReportScheduleList;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 
 import java.net.URI;
@@ -82,6 +84,7 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
 
     @SneakyThrows
     public ReportDocument getReportDocument(String reportDocumentId) {
+        reportDocumentId = StringUtils.isEmpty(reportDocumentId) ? "" : reportDocumentId;
 
         final var signRequest = signRequest(
             ConstantCodes.REPORT_DOCUMENTS_API_V202106.concat("/").concat(reportDocumentId),
@@ -115,8 +118,10 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
         );
 
         URIBuilder uriBuilder = new URIBuilder(sellingRegionEndpoint + ConstantCodes.REPORTS_API_V202106);
-        for (String key : params.keySet()) {
-            uriBuilder.addParameter(key, params.get(key));
+        if (params != null && !params.isEmpty()) {
+            for (String key : params.keySet()) {
+                uriBuilder.addParameter(key, params.get(key));
+            }
         }
 
         URI uri = uriBuilder.build();
@@ -136,7 +141,8 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
     }
 
     @SneakyThrows
-    public Void cancelReport(String reportId) {
+    public CancelResponse cancelReport(String reportId) {
+        reportId = StringUtils.isEmpty(reportId) ? "" : reportId;
 
         final var signRequest = signRequest(
             ConstantCodes.REPORTS_API_V202106.concat("/").concat(reportId),
@@ -156,7 +162,7 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .build();
 
         return HttpClient.newHttpClient()
-            .send(request, HttpResponse.BodyHandlers.discarding())
+            .send(request, new JsonBodyHandler<>(CancelResponse.class))
             .body();
     }
 
@@ -182,6 +188,7 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
 
     @SneakyThrows
     public ReportSchedule getReportSchedule(String reportScheduleId) {
+        reportScheduleId = StringUtils.isEmpty(reportScheduleId) ? "" : reportScheduleId;
 
         final var signRequest = signRequest(
             ConstantCodes.REPORT_SCHEDULES_API_V202106.concat("/").concat(reportScheduleId),
@@ -212,8 +219,10 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             null);
 
         URIBuilder uriBuilder = new URIBuilder(sellingRegionEndpoint + ConstantCodes.REPORT_SCHEDULES_API_V202106);
-        for (String key : params.keySet()) {
-            uriBuilder.addParameter(key, params.get(key));
+        if (params != null && !params.isEmpty()) {
+            for (String key : params.keySet()) {
+                uriBuilder.addParameter(key, params.get(key));
+            }
         }
 
         URI uri = uriBuilder.build();
@@ -231,14 +240,19 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
     }
 
     @SneakyThrows
-    public Void cancelReportSchedule(String reportScheduleId) {
+    public CancelResponse cancelReportSchedule(String reportScheduleId) {
+        reportScheduleId = StringUtils.isEmpty(reportScheduleId) ? "" : reportScheduleId;
 
-        final var signRequest = signRequest(ConstantCodes.REPORT_SCHEDULES_API_V202106.concat("/").concat(
-            reportScheduleId), HttpMethodName.DELETE, null, null);
+        final var signRequest = signRequest(
+            ConstantCodes.REPORT_SCHEDULES_API_V202106.concat("/").concat(reportScheduleId),
+            HttpMethodName.DELETE,
+            null,
+            null
+        );
 
-        HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.REPORT_SCHEDULES_API_V202106
-                .concat("/").concat(reportScheduleId)))
-            .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+        HttpRequest request = HttpRequest.newBuilder(
+            new URI(sellingRegionEndpoint + ConstantCodes.REPORT_SCHEDULES_API_V202106.concat("/").concat(reportScheduleId))
+            ).header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
             .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
             .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
             .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
@@ -248,7 +262,7 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .build();
 
         return HttpClient.newHttpClient()
-            .send(request, HttpResponse.BodyHandlers.discarding())
+            .send(request, new JsonBodyHandler<>(CancelResponse.class))
             .body();
     }
 }

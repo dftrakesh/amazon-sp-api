@@ -10,6 +10,7 @@ import io.github.dft.amazon.model.orders.v0.GetOrderResponse;
 import io.github.dft.amazon.model.orders.v0.GetOrdersResponse;
 import lombok.SneakyThrows;
 import org.apache.http.client.utils.URIBuilder;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -29,8 +30,10 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
         final var signRequest = signRequest(ConstantCodes.ORDERS_API_V0, HttpMethodName.GET, params, null);
 
         URIBuilder uriBuilder = new URIBuilder(sellingRegionEndpoint + ConstantCodes.ORDERS_API_V0);
-        for (String key : params.keySet()) {
-            uriBuilder.addParameter(key, params.get(key));
+        if (params != null && !params.isEmpty()) {
+            for (String key : params.keySet()) {
+                uriBuilder.addParameter(key, params.get(key));
+            }
         }
 
         URI uri = uriBuilder.build();
