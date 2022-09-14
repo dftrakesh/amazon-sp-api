@@ -12,11 +12,7 @@ import io.github.dft.amazon.constantcode.ConstantCodes;
 import io.github.dft.amazon.model.AccessCredentials;
 import io.github.dft.amazon.model.auth.AccessTokenResponse;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
-import io.github.dft.amazon.model.reports.v202106.CreateReportResponse;
-import io.github.dft.amazon.model.reports.v202106.CreateReportSpecification;
-import io.github.dft.amazon.model.sellersapi.v1.GetMarketplaceParticipationsResponse;
 import lombok.SneakyThrows;
-
 import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -25,7 +21,6 @@ import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class AmazonSellingPartnerSdk {
