@@ -12,6 +12,7 @@ import io.github.dft.amazon.model.orders.v0.GetOrderRegulatedInfoResponse;
 import io.github.dft.amazon.model.orders.v0.GetOrderResponse;
 import io.github.dft.amazon.model.orders.v0.GetOrdersResponse;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 
 import java.net.URI;
@@ -57,6 +58,7 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
 
     @SneakyThrows
     public GetOrderResponse getOrder(String orderId) {
+        orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
         refreshAccessToken();
 
         final var signRequest = signRequest(ConstantCodes.ORDER_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
@@ -78,6 +80,7 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
 
     @SneakyThrows
     public GetOrderBuyerInfoResponse getOrderBuyerInfo(String orderId) {
+        orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
         refreshAccessToken();
 
         final var signRequest = signRequest(ConstantCodes.ORDER_BUYER_INFO_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
@@ -99,6 +102,7 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
 
     @SneakyThrows
     public GetOrderAddressResponse getAddress(String orderId) {
+        orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
         refreshAccessToken();
 
         final var signRequest = signRequest(ConstantCodes.ORDER_ADDRESS_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
@@ -120,6 +124,7 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
 
     @SneakyThrows
     public GetOrderItemsResponse getOrderItems(String orderId) {
+        orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
         refreshAccessToken();
 
         final var signRequest = signRequest(ConstantCodes.ORDER_ITEMS_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
@@ -141,6 +146,7 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
 
     @SneakyThrows
     public GetOrderItemsBuyerInfoResponse getOrderItemsBuyerInfo(String orderId) {
+        orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
         refreshAccessToken();
 
         final var signRequest = signRequest(ConstantCodes.ORDER_ITEMS_BUYER_INFO_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
@@ -162,6 +168,7 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
 
     @SneakyThrows
     public GetOrderRegulatedInfoResponse getOrderRegulatedInfo(String orderId) {
+        orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
         refreshAccessToken();
 
         final var signRequest = signRequest(ConstantCodes.ORDER_REGULATED_INFO_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
