@@ -7,9 +7,9 @@ import java.util.List;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GetOrderBuyerInfoResponse {
+public class GetOrderItemsBuyerInfoResponse {
 
-    private OrderBuyerInfo payload;
+    private OrderItemsBuyerInfoList payload;
 
     private List<Error> errors;
 }

@@ -24,6 +24,9 @@ public interface ConstantCodes {
     String ORDER_API_V0 = "/orders/v0/orders/{orderId}";
     String ORDER_BUYER_INFO_API_V0 = "/orders/v0/orders/{orderId}/buyerInfo";
     String ORDER_ADDRESS_API_V0 = "/orders/v0/orders/{orderId}/address";
+    String ORDER_ITEMS_API_V0 = "/orders/v0/orders/{orderId}/orderItems";
+    String ORDER_ITEMS_BUYER_INFO_API_V0 = "/orders/v0/orders/{orderId}/orderItems/buyerInfo";
+    String ORDER_REGULATED_INFO_API_V0 = "/orders/v0/orders/{orderId}/regulatedInfo";
 
     String LWA_AUTHORIZATION_SERVER = "https://api.amazon.com/auth/o2/token";
 
