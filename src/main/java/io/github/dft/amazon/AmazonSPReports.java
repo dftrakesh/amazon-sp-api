@@ -23,12 +23,16 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 
 public class AmazonSPReports extends AmazonSellingPartnerSdk {
+
+    private final HttpClient client;
 
     @SneakyThrows
     public AmazonSPReports(AccessCredentials accessCredentials) {
         super(accessCredentials);
+        client = HttpClient.newHttpClient();
     }
 
     @SneakyThrows
@@ -52,9 +56,8 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .POST(HttpRequest.BodyPublishers.ofString(requestBody))
             .build();
 
-        return HttpClient.newHttpClient()
-            .send(request, new JsonBodyHandler<>(CreateReportResponse.class))
-            .body();
+        HttpResponse.BodyHandler<CreateReportResponse> handler = new JsonBodyHandler<>(CreateReportResponse.class);
+        return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
@@ -77,9 +80,8 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .GET()
             .build();
 
-        return HttpClient.newHttpClient()
-            .send(request, new JsonBodyHandler<>(Report.class))
-            .body();
+        HttpResponse.BodyHandler<Report> handler = new JsonBodyHandler<>(Report.class);
+        return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
@@ -103,9 +105,8 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .GET()
             .build();
 
-        return HttpClient.newHttpClient()
-            .send(request, new JsonBodyHandler<>(ReportDocument.class))
-            .body();
+        HttpResponse.BodyHandler<ReportDocument> handler = new JsonBodyHandler<>(ReportDocument.class);
+        return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
@@ -135,9 +136,8 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .GET()
             .build();
 
-        return HttpClient.newHttpClient()
-            .send(request, new JsonBodyHandler<>(GetReportsResponse.class))
-            .body();
+        HttpResponse.BodyHandler<GetReportsResponse> handler = new JsonBodyHandler<>(GetReportsResponse.class);
+        return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
@@ -161,9 +161,8 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .DELETE()
             .build();
 
-        return HttpClient.newHttpClient()
-            .send(request, new JsonBodyHandler<>(CancelResponse.class))
-            .body();
+        HttpResponse.BodyHandler<CancelResponse> handler = new JsonBodyHandler<>(CancelResponse.class);
+        return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
@@ -181,9 +180,8 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
             .POST(HttpRequest.BodyPublishers.ofString(requestBody)).build();
 
-        return HttpClient.newHttpClient()
-            .send(request, new JsonBodyHandler<>(CreateReportScheduleResponse.class))
-            .body();
+        HttpResponse.BodyHandler<CreateReportScheduleResponse> handler = new JsonBodyHandler<>(CreateReportScheduleResponse.class);
+        return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
@@ -206,9 +204,8 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
             .build();
 
-        return HttpClient.newHttpClient()
-            .send(request, new JsonBodyHandler<>(ReportSchedule.class))
-            .body();
+        HttpResponse.BodyHandler<ReportSchedule> handler = new JsonBodyHandler<>(ReportSchedule.class);
+        return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
@@ -234,9 +231,8 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN)).header(ConstantCodes.X_AMZ_DATE,
             signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE)).build();
 
-        return HttpClient.newHttpClient()
-            .send(request, new JsonBodyHandler<>(ReportScheduleList.class))
-            .body();
+        HttpResponse.BodyHandler<ReportScheduleList> handler = new JsonBodyHandler<>(ReportScheduleList.class);
+        return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
@@ -251,7 +247,7 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
         );
 
         HttpRequest request = HttpRequest.newBuilder(
-            new URI(sellingRegionEndpoint + ConstantCodes.REPORT_SCHEDULES_API_V202106.concat("/").concat(reportScheduleId))
+                new URI(sellingRegionEndpoint + ConstantCodes.REPORT_SCHEDULES_API_V202106.concat("/").concat(reportScheduleId))
             ).header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
             .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
             .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
@@ -261,8 +257,17 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .DELETE()
             .build();
 
-        return HttpClient.newHttpClient()
-            .send(request, new JsonBodyHandler<>(CancelResponse.class))
+        HttpResponse.BodyHandler<CancelResponse> handler = new JsonBodyHandler<>(CancelResponse.class);
+        return getRequestWrapped(request, handler);
+    }
+
+    @SneakyThrows
+    public <T> T getRequestWrapped(HttpRequest request, HttpResponse.BodyHandler<T> handler) {
+
+        return client
+            .sendAsync(request, handler)
+            .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
+            .get()
             .body();
     }
 }
