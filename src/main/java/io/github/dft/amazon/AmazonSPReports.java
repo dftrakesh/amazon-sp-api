@@ -270,4 +270,18 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .get()
             .body();
     }
+
+    @SneakyThrows
+    public <T> CompletableFuture<HttpResponse<T>> tryResend(HttpClient client,
+                                                            HttpRequest request,
+                                                            HttpResponse.BodyHandler<T> handler,
+                                                            HttpResponse<T> resp, int count) {
+
+        if (resp.statusCode() == 429 && count < 5000) {
+            Thread.sleep(5000);
+            return client.sendAsync(request, handler)
+                .thenComposeAsync(response -> tryResend(client, request, handler, response, count + 1));
+        }
+        return CompletableFuture.completedFuture(resp);
+    }
 }
