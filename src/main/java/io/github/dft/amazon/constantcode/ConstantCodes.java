@@ -27,7 +27,10 @@ public interface ConstantCodes {
     String ORDER_ITEMS_API_V0 = "/orders/v0/orders/{orderId}/orderItems";
     String ORDER_ITEMS_BUYER_INFO_API_V0 = "/orders/v0/orders/{orderId}/orderItems/buyerInfo";
     String ORDER_REGULATED_INFO_API_V0 = "/orders/v0/orders/{orderId}/regulatedInfo";
-
+    String TOKENS_API_V202103 = "/tokens/2021-03-01/restrictedDataToken";
+    String  PRODUCTFEES_API_FEESESTIMATE_FOR_SKU_V0 = "/products/fees/v0/listings/%s/feesEstimate";
+    String  PRODUCTFEES_API_FEESESTIMATE_FOR_ASIN_V0 = "/products/fees/v0/items/%s/feesEstimate";
+    String  PRODUCTFEES_API_MY_FEESESTIMATE_V0 = "/products/fees/v0/feesEstimate";
     String LWA_AUTHORIZATION_SERVER = "https://api.amazon.com/auth/o2/token";
 
     String AWS_REGION_US_EAST_1 = "us-east-1";
@@ -37,5 +40,5 @@ public interface ConstantCodes {
     String SERVICE_NAME = "execute-api";
     String X_AMZ_DATE = "X-Amz-Date" ;
 
-    String TOKENS_API_V202103 = "/tokens/2021-03-01/restrictedDataToken";
+
 }
