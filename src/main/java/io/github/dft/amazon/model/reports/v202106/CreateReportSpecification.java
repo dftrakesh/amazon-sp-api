@@ -12,7 +12,7 @@ public class CreateReportSpecification {
 
     private ReportOptions reportOptions;
     private String reportType;
-    private ZonedDateTime dataStartTime;
-    private ZonedDateTime dataEndTime;
+    private String dataStartTime;
+    private String dataEndTime;
     private List<String> marketplaceIds;
 }
