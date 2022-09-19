@@ -6,9 +6,13 @@ import io.github.dft.amazon.model.AccessCredentials;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
 import io.github.dft.amazon.model.orders.v0.GetOrderAddressResponse;
 import io.github.dft.amazon.model.orders.v0.GetOrderBuyerInfoResponse;
+import io.github.dft.amazon.model.orders.v0.GetOrderItemsBuyerInfoResponse;
+import io.github.dft.amazon.model.orders.v0.GetOrderItemsResponse;
+import io.github.dft.amazon.model.orders.v0.GetOrderRegulatedInfoResponse;
 import io.github.dft.amazon.model.orders.v0.GetOrderResponse;
 import io.github.dft.amazon.model.orders.v0.GetOrdersResponse;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 
 import java.net.URI;
@@ -58,6 +62,7 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
 
     @SneakyThrows
     public GetOrderResponse getOrder(String orderId) {
+        orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
         refreshAccessToken();
 
         final var signRequest = signRequest(ConstantCodes.ORDER_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
@@ -78,6 +83,7 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
 
     @SneakyThrows
     public GetOrderBuyerInfoResponse getOrderBuyerInfo(String orderId) {
+        orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
         refreshAccessToken();
 
         final var signRequest = signRequest(ConstantCodes.ORDER_BUYER_INFO_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
@@ -98,6 +104,7 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
 
     @SneakyThrows
     public GetOrderAddressResponse getAddress(String orderId) {
+        orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
         refreshAccessToken();
 
         final var signRequest = signRequest(ConstantCodes.ORDER_ADDRESS_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
@@ -123,6 +130,72 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
             .sendAsync(request, handler)
             .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
             .get()
+            .body();
+    }
+
+    @SneakyThrows
+    public GetOrderItemsResponse getOrderItems(String orderId) {
+        orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
+        refreshAccessToken();
+
+        final var signRequest = signRequest(ConstantCodes.ORDER_ITEMS_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
+
+        HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.ORDER_ITEMS_API_V0.replace("{orderId}", orderId)))
+            .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+            .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+            .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
+            .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
+            .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
+            .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
+            .GET()
+            .build();
+
+        return HttpClient.newHttpClient()
+            .send(request, new JsonBodyHandler<>(GetOrderItemsResponse.class))
+            .body();
+    }
+
+    @SneakyThrows
+    public GetOrderItemsBuyerInfoResponse getOrderItemsBuyerInfo(String orderId) {
+        orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
+        refreshAccessToken();
+
+        final var signRequest = signRequest(ConstantCodes.ORDER_ITEMS_BUYER_INFO_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
+
+        HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.ORDER_ITEMS_BUYER_INFO_API_V0.replace("{orderId}", orderId)))
+            .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+            .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+            .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
+            .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
+            .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
+            .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
+            .GET()
+            .build();
+
+        return HttpClient.newHttpClient()
+            .send(request, new JsonBodyHandler<>(GetOrderItemsBuyerInfoResponse.class))
+            .body();
+    }
+
+    @SneakyThrows
+    public GetOrderRegulatedInfoResponse getOrderRegulatedInfo(String orderId) {
+        orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
+        refreshAccessToken();
+
+        final var signRequest = signRequest(ConstantCodes.ORDER_REGULATED_INFO_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
+
+        HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.ORDER_REGULATED_INFO_API_V0.replace("{orderId}", orderId)))
+            .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+            .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+            .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
+            .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
+            .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
+            .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
+            .GET()
+            .build();
+
+        return HttpClient.newHttpClient()
+            .send(request, new JsonBodyHandler<>(GetOrderRegulatedInfoResponse.class))
             .body();
     }
 
