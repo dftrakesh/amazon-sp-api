@@ -39,6 +39,10 @@ public interface ConstantCodes {
 
     String SERVICE_NAME = "execute-api";
     String X_AMZ_DATE = "X-Amz-Date" ;
+    String X_AMZN_RATE_LIMIT = "x-amzn-RateLimit-Limit";
+
+    int MAX_ATTEMPTS = 5000;
+    int TIME_OUT_DURATION = 5000;
 
 
 }
