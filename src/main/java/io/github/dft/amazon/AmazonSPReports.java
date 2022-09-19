@@ -109,12 +109,7 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
 
         return client
             .sendAsync(request, handler)
-            .thenComposeAsync(response -> {
-                if (!CollectionUtils.isNullOrEmpty(response.headers().map().get(X_AMZN_RATE_LIMIT))) {
-                    rateLimitConstants.GET_REPORT_RATE_LIMIT = Integer.parseInt(response.headers().map().get(X_AMZN_RATE_LIMIT).get(0).split("\\.")[0]);
-                }
-                return tryResend(client, request, handler, response, 1);
-            })
+            .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
             .get()
             .body();
     }

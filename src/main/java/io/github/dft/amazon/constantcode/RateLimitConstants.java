@@ -10,8 +10,8 @@ public class RateLimitConstants {
     public int CREATE_REPORT_RATE_LIMIT = 1;
 
     public int GET_REPORT_API_CALL = 1;
-    public int GET_REPORT_LIMIT_REFRESH = 4000;
-    public int GET_REPORT_RATE_LIMIT = 1;
+    public int GET_REPORT_LIMIT_REFRESH = 1000;
+    public int GET_REPORT_RATE_LIMIT = 2;
 
     public int GET_REPORT_DOCUMENT = 1;
     public int GET_REPORT_DOCUMENT_LIMIT_REFRESH = 60000;
