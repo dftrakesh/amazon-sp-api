@@ -10,10 +10,16 @@ import lombok.SneakyThrows;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.concurrent.CompletableFuture;
 
 public class AmazonSPTokens extends AmazonSellingPartnerSdk {
+
+    private final HttpClient client;
+
     public AmazonSPTokens(AccessCredentials accessCredentials) {
         super(accessCredentials);
+        client = HttpClient.newHttpClient();
     }
 
     @SneakyThrows
@@ -32,8 +38,31 @@ public class AmazonSPTokens extends AmazonSellingPartnerSdk {
             .POST(HttpRequest.BodyPublishers.ofString(requestBody))
             .build();
 
-        return HttpClient.newHttpClient()
-            .send(request, new JsonBodyHandler<>(CreateRestrictedDataTokenResponse.class))
+        HttpResponse.BodyHandler<CreateRestrictedDataTokenResponse> handler = new JsonBodyHandler<>(CreateRestrictedDataTokenResponse.class);
+        return getRequestWrapped(request, handler);
+    }
+
+    @SneakyThrows
+    public <T> T getRequestWrapped(HttpRequest request, HttpResponse.BodyHandler<T> handler) {
+
+        return client
+            .sendAsync(request, handler)
+            .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
+            .get()
             .body();
+    }
+
+    @SneakyThrows
+    public <T> CompletableFuture<HttpResponse<T>> tryResend(HttpClient client,
+                                                            HttpRequest request,
+                                                            HttpResponse.BodyHandler<T> handler,
+                                                            HttpResponse<T> resp, int count) {
+
+        if (resp.statusCode() == 429 && count < 5000) {
+            Thread.sleep(5000);
+            return client.sendAsync(request, handler)
+                .thenComposeAsync(response -> tryResend(client, request, handler, response, count + 1));
+        }
+        return CompletableFuture.completedFuture(resp);
     }
 }

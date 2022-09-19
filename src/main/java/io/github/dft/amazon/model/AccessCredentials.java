@@ -2,6 +2,7 @@ package io.github.dft.amazon.model;
 
 import lombok.Data;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Data
@@ -20,7 +21,7 @@ public class AccessCredentials {
     private String accessToken;
     private String refreshToken;
     private String tokenType;
-    private long expiresInTime;
+    private ZonedDateTime expiresInTime;
     private String spAPIEndpoint;
     private List<String> marketplaces;
 }

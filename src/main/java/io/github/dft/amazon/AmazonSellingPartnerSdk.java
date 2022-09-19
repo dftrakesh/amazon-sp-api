@@ -19,6 +19,8 @@ import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -51,12 +53,12 @@ public class AmazonSellingPartnerSdk {
     }
 
     protected DefaultRequest<Object> signRequest(String resourcePath, HttpMethodName httpMethodName, Map<String, String> params, String payload) {
-
+        refreshAccessToken();
         var basicAWSCredentials = new BasicAWSCredentials(accessCredentials.getAccessKeyId(), accessCredentials.getSecretAccessKey());
-        var credentialsProvider =  new STSAssumeRoleSessionCredentialsProvider.Builder(accessCredentials.getRoleArn(),
-                "rakesh")
-                .withStsClient(AWSSecurityTokenServiceClientBuilder.standard().withRegion(accessCredentials.getRegion()).
-                        withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials)).build()).build();
+        var credentialsProvider = new STSAssumeRoleSessionCredentialsProvider.Builder(accessCredentials.getRoleArn(),
+            "rakesh")
+            .withStsClient(AWSSecurityTokenServiceClientBuilder.standard().withRegion(accessCredentials.getRegion()).
+                withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials)).build()).build();
 
 
         AWS4Signer signer = new AWS4Signer();
@@ -83,27 +85,28 @@ public class AmazonSellingPartnerSdk {
 
     @SneakyThrows
     public void refreshAccessToken() {
+        if (accessCredentials.getAccessToken() == null || accessCredentials.getExpiresInTime() == null || ZonedDateTime.now(ZoneOffset.UTC).isAfter(accessCredentials.getExpiresInTime())) {
+            Map<Object, Object> data = new HashMap<>();
+            data.put(ConstantCodes.HTTP_OAUTH_PARAMETER_GRANT_TYPE, ConstantCodes.REFRESH_TOKEN);
+            data.put(ConstantCodes.HTTP_OAUTH_PARAMETER_REFRESH_TOKEN, accessCredentials.getRefreshToken());
+            data.put(ConstantCodes.HTTP_OAUTH_PARAMETER_CLIENT_ID, accessCredentials.getClientIdentifier());
+            data.put(ConstantCodes.HTTP_OAUTH_PARAMETER_CLIENT_SECRET, accessCredentials.getClientSecret());
 
-        Map<Object, Object> data = new HashMap<>();
-        data.put(ConstantCodes.HTTP_OAUTH_PARAMETER_GRANT_TYPE, ConstantCodes.REFRESH_TOKEN);
-        data.put(ConstantCodes.HTTP_OAUTH_PARAMETER_REFRESH_TOKEN, accessCredentials.getRefreshToken());
-        data.put(ConstantCodes.HTTP_OAUTH_PARAMETER_CLIENT_ID, accessCredentials.getClientIdentifier());
-        data.put(ConstantCodes.HTTP_OAUTH_PARAMETER_CLIENT_SECRET, accessCredentials.getClientSecret());
-
-        HttpRequest request = HttpRequest.newBuilder(new URI(ConstantCodes.LWA_AUTHORIZATION_SERVER))
+            HttpRequest request = HttpRequest.newBuilder(new URI(ConstantCodes.LWA_AUTHORIZATION_SERVER))
                 .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_FORM_URL_ENCODED)
                 .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
                 .POST(ofFormData(data))
                 .build();
 
-        AccessTokenResponse accessTokenResponse = HttpClient.newHttpClient()
+            AccessTokenResponse accessTokenResponse = HttpClient.newHttpClient()
                 .send(request, new JsonBodyHandler<>(AccessTokenResponse.class))
                 .body();
 
-        accessCredentials.setAccessToken(accessTokenResponse.getAccessToken());
-        accessCredentials.setRefreshToken(accessTokenResponse.getRefreshToken());
-        accessCredentials.setExpiresInTime(accessTokenResponse.getExpiresIn());
-        accessCredentials.setTokenType(accessTokenResponse.getTokenType());
+            accessCredentials.setAccessToken(accessTokenResponse.getAccessToken());
+            accessCredentials.setRefreshToken(accessTokenResponse.getRefreshToken());
+            accessCredentials.setExpiresInTime(ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(accessTokenResponse.getExpiresIn()));
+            accessCredentials.setTokenType(accessTokenResponse.getTokenType());
+        }
     }
 
     public HttpRequest.BodyPublisher ofFormData(Map<Object, Object> data) {

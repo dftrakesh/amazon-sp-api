@@ -18,18 +18,22 @@ import org.apache.http.client.utils.URIBuilder;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 
 public class AmazonSPOrders extends AmazonSellingPartnerSdk {
+
+    private final HttpClient client;
 
     @SneakyThrows
     public AmazonSPOrders(AccessCredentials accessCredentials) {
         super(accessCredentials);
+        client = HttpClient.newHttpClient();
     }
 
     @SneakyThrows
     public GetOrdersResponse getOrders(HashMap<String, String> params) {
-        refreshAccessToken();
 
         final var signRequest = signRequest(ConstantCodes.ORDERS_API_V0, HttpMethodName.GET, params, null);
 
@@ -51,15 +55,13 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
             .GET()
             .build();
 
-        return HttpClient.newHttpClient()
-            .send(request, new JsonBodyHandler<>(GetOrdersResponse.class))
-            .body();
+        HttpResponse.BodyHandler<GetOrdersResponse> handler = new JsonBodyHandler<>(GetOrdersResponse.class);
+        return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
     public GetOrderResponse getOrder(String orderId) {
         orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
-        refreshAccessToken();
 
         final var signRequest = signRequest(ConstantCodes.ORDER_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
 
@@ -73,15 +75,13 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
             .GET()
             .build();
 
-        return HttpClient.newHttpClient()
-            .send(request, new JsonBodyHandler<>(GetOrderResponse.class))
-            .body();
+        HttpResponse.BodyHandler<GetOrderResponse> handler = new JsonBodyHandler<>(GetOrderResponse.class);
+        return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
     public GetOrderBuyerInfoResponse getOrderBuyerInfo(String orderId) {
         orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
-        refreshAccessToken();
 
         final var signRequest = signRequest(ConstantCodes.ORDER_BUYER_INFO_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
 
@@ -95,15 +95,13 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
             .GET()
             .build();
 
-        return HttpClient.newHttpClient()
-            .send(request, new JsonBodyHandler<>(GetOrderBuyerInfoResponse.class))
-            .body();
+        HttpResponse.BodyHandler<GetOrderBuyerInfoResponse> handler = new JsonBodyHandler<>(GetOrderBuyerInfoResponse.class);
+        return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
     public GetOrderAddressResponse getAddress(String orderId) {
         orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
-        refreshAccessToken();
 
         final var signRequest = signRequest(ConstantCodes.ORDER_ADDRESS_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
 
@@ -117,15 +115,23 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
             .GET()
             .build();
 
-        return HttpClient.newHttpClient()
-            .send(request, new JsonBodyHandler<>(GetOrderAddressResponse.class))
+        HttpResponse.BodyHandler<GetOrderAddressResponse> handler = new JsonBodyHandler<>(GetOrderAddressResponse.class);
+        return getRequestWrapped(request, handler);
+    }
+
+    @SneakyThrows
+    public <T> T getRequestWrapped(HttpRequest request, HttpResponse.BodyHandler<T> handler) {
+
+        return client
+            .sendAsync(request, handler)
+            .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
+            .get()
             .body();
     }
 
     @SneakyThrows
     public GetOrderItemsResponse getOrderItems(String orderId) {
         orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
-        refreshAccessToken();
 
         final var signRequest = signRequest(ConstantCodes.ORDER_ITEMS_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
 
@@ -147,7 +153,6 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
     @SneakyThrows
     public GetOrderItemsBuyerInfoResponse getOrderItemsBuyerInfo(String orderId) {
         orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
-        refreshAccessToken();
 
         final var signRequest = signRequest(ConstantCodes.ORDER_ITEMS_BUYER_INFO_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
 
@@ -169,7 +174,6 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
     @SneakyThrows
     public GetOrderRegulatedInfoResponse getOrderRegulatedInfo(String orderId) {
         orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
-        refreshAccessToken();
 
         final var signRequest = signRequest(ConstantCodes.ORDER_REGULATED_INFO_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
 
@@ -186,5 +190,19 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
         return HttpClient.newHttpClient()
             .send(request, new JsonBodyHandler<>(GetOrderRegulatedInfoResponse.class))
             .body();
+    }
+
+    @SneakyThrows
+    public <T> CompletableFuture<HttpResponse<T>> tryResend(HttpClient client,
+                                                            HttpRequest request,
+                                                            HttpResponse.BodyHandler<T> handler,
+                                                            HttpResponse<T> resp, int count) {
+
+        if (resp.statusCode() == 429 && count < 5000) {
+            Thread.sleep(5000);
+            return client.sendAsync(request, handler)
+                .thenComposeAsync(response -> tryResend(client, request, handler, response, count + 1));
+        }
+        return CompletableFuture.completedFuture(resp);
     }
 }
