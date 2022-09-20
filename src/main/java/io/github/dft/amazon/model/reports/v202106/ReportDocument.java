@@ -7,8 +7,10 @@ import java.util.List;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CreateReportResponse {
+public class ReportDocument {
 
-    private String reportId;
+    private String reportDocumentId;
+    private String url;
+    private String compressionAlgorithm;
     private List<Error> errors;
 }
