@@ -2,22 +2,30 @@ package io.github.dft.amazon;
 
 import com.amazonaws.http.HttpMethodName;
 import io.github.dft.amazon.constantcode.ConstantCodes;
+import io.github.dft.amazon.constantcode.RateLimitConstants;
 import io.github.dft.amazon.model.AccessCredentials;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
 import io.github.dft.amazon.model.productfees.GetMyFeesEstimateResponse;
 import io.github.dft.amazon.model.productfees.GetMyFeesEstimatesRequest;
-import io.github.dft.amazon.model.tokens.v202103.CreateRestrictedDataTokenRequest;
-import io.github.dft.amazon.model.tokens.v202103.CreateRestrictedDataTokenResponse;
 import lombok.SneakyThrows;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.concurrent.CompletableFuture;
+
+import static io.github.dft.amazon.constantcode.ConstantCodes.MAX_ATTEMPTS;
+import static io.github.dft.amazon.constantcode.ConstantCodes.TIME_OUT_DURATION;
 
 public class AmazonSPProductFees extends AmazonSellingPartnerSdk {
+
+    private final HttpClient client;
+    private final RateLimitConstants rateLimitConstants;
     public AmazonSPProductFees(AccessCredentials accessCredentials) {
         super(accessCredentials);
+        this.rateLimitConstants = new RateLimitConstants();
+        this.client = HttpClient.newHttpClient();
     }
 
     @SneakyThrows
@@ -37,9 +45,13 @@ public class AmazonSPProductFees extends AmazonSellingPartnerSdk {
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
 
-        return HttpClient.newHttpClient()
-                .send(request, new JsonBodyHandler<>(GetMyFeesEstimateResponse.class))
-                .body();
+        HttpResponse.BodyHandler<GetMyFeesEstimateResponse> handler = new JsonBodyHandler<>(GetMyFeesEstimateResponse.class);
+        rateLimitConstants.GET_MY_FEES_ESTIMATE_FOR_SKU_API_CALL = setRateLimit(
+            rateLimitConstants.GET_MY_FEES_ESTIMATE_FOR_SKU_API_CALL,
+            rateLimitConstants.GET_MY_FEES_ESTIMATE_FOR_SKU_LIMIT_REFRESH,
+            rateLimitConstants.GET_MY_FEES_ESTIMATE_FOR_SKU_RATE_LIMIT
+        );
+        return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
@@ -58,9 +70,13 @@ public class AmazonSPProductFees extends AmazonSellingPartnerSdk {
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
 
-        return HttpClient.newHttpClient()
-                .send(request, new JsonBodyHandler<>(GetMyFeesEstimateResponse.class))
-                .body();
+        HttpResponse.BodyHandler<GetMyFeesEstimateResponse> handler = new JsonBodyHandler<>(GetMyFeesEstimateResponse.class);
+        rateLimitConstants.GET_MY_FEES_ESTIMATES_API_CALL = setRateLimit(
+            rateLimitConstants.GET_MY_FEES_ESTIMATES_API_CALL,
+            rateLimitConstants.GET_MY_FEES_ESTIMATES_LIMIT_REFRESH,
+            rateLimitConstants.GET_MY_FEES_ESTIMATES_RATE_LIMIT
+        );
+        return getRequestWrapped(request, handler);
     }
 
 
@@ -82,8 +98,45 @@ public class AmazonSPProductFees extends AmazonSellingPartnerSdk {
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
 
-        return HttpClient.newHttpClient()
-                .send(request, new JsonBodyHandler<>(GetMyFeesEstimateResponse.class))
-                .body();
+        HttpResponse.BodyHandler<GetMyFeesEstimateResponse> handler = new JsonBodyHandler<>(GetMyFeesEstimateResponse.class);
+        rateLimitConstants.GET_MY_FEES_ESTIMATE_API_CALL = setRateLimit(
+            rateLimitConstants.GET_MY_FEES_ESTIMATE_API_CALL,
+            rateLimitConstants.GET_MY_FEES_ESTIMATE_LIMIT_REFRESH,
+            rateLimitConstants.GET_MY_FEES_ESTIMATE_RATE_LIMIT
+        );
+        return getRequestWrapped(request, handler);
+    }
+
+    @SneakyThrows
+    public <T> T getRequestWrapped(HttpRequest request, HttpResponse.BodyHandler<T> handler) {
+
+        return client
+            .sendAsync(request, handler)
+            .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
+            .get()
+            .body();
+    }
+
+    @SneakyThrows
+    public <T> CompletableFuture<HttpResponse<T>> tryResend(HttpClient client,
+                                                            HttpRequest request,
+                                                            HttpResponse.BodyHandler<T> handler,
+                                                            HttpResponse<T> resp, int count) {
+
+        if (resp.statusCode() == 429 && count < MAX_ATTEMPTS) {
+            Thread.sleep(TIME_OUT_DURATION);
+            return client.sendAsync(request, handler)
+                .thenComposeAsync(response -> tryResend(client, request, handler, response, count + 1));
+        }
+        return CompletableFuture.completedFuture(resp);
+    }
+
+    @SneakyThrows
+    public int setRateLimit(int apiCall, int limitRefreshPeriod, int rateLimit) {
+        if (apiCall <= 0) {
+            Thread.sleep(limitRefreshPeriod);
+            apiCall = rateLimit;
+        }
+        return apiCall - 1;
     }
 }

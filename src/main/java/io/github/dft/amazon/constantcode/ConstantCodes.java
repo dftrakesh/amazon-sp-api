@@ -40,5 +40,8 @@ public interface ConstantCodes {
     String SERVICE_NAME = "execute-api";
     String X_AMZ_DATE = "X-Amz-Date" ;
 
+    int MAX_ATTEMPTS = 5000;
+    int TIME_OUT_DURATION = 5000;
+
 
 }
