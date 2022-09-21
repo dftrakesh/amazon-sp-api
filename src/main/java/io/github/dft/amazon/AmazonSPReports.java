@@ -17,7 +17,6 @@ import io.github.dft.amazon.model.reports.v202106.ReportDocument;
 import io.github.dft.amazon.model.reports.v202106.ReportSchedule;
 import io.github.dft.amazon.model.reports.v202106.ReportScheduleList;
 import lombok.SneakyThrows;
-import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 
@@ -30,9 +29,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static io.github.dft.amazon.constantcode.ConstantCodes.MAX_ATTEMPTS;
 import static io.github.dft.amazon.constantcode.ConstantCodes.TIME_OUT_DURATION;
-import static io.github.dft.amazon.constantcode.ConstantCodes.X_AMZN_RATE_LIMIT;
 
-@Log4j2
 public class AmazonSPReports extends AmazonSellingPartnerSdk {
 
     private final HttpClient client;
