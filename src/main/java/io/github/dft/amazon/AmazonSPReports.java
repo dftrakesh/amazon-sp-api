@@ -1,7 +1,6 @@
 package io.github.dft.amazon;
 
 import com.amazonaws.http.HttpMethodName;
-import com.amazonaws.util.CollectionUtils;
 import io.github.dft.amazon.constantcode.ConstantCodes;
 import io.github.dft.amazon.constantcode.RateLimitConstants;
 import io.github.dft.amazon.model.AccessCredentials;
@@ -30,9 +29,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static io.github.dft.amazon.constantcode.ConstantCodes.MAX_ATTEMPTS;
 import static io.github.dft.amazon.constantcode.ConstantCodes.TIME_OUT_DURATION;
-import static io.github.dft.amazon.constantcode.ConstantCodes.X_AMZN_RATE_LIMIT;
 
-@Log4j2
 public class AmazonSPReports extends AmazonSellingPartnerSdk {
 
     private final HttpClient client;
@@ -337,10 +334,7 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
 
         return client
             .sendAsync(request, handler)
-            .thenComposeAsync(response -> {
-                log.debug("statusCode: {} rate-limit: {}", response.statusCode(), response.headers().map().get(X_AMZN_RATE_LIMIT));
-                return tryResend(client, request, handler, response, 1);
-            })
+            .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
             .get()
             .body();
     }
