@@ -88,4 +88,12 @@ public class RateLimitConstants {
     public int GET_MY_FEES_ESTIMATES_API_CALL = 1;
     public int GET_MY_FEES_ESTIMATES_LIMIT_REFRESH = 1000;
     public int GET_MY_FEES_ESTIMATES_RATE_LIMIT = 1;
+
+    public int GET_CATALOG_ITEM_API_CALL = 2;
+    public int GET_CATALOG_ITEM_LIMIT_REFRESH = 2000;
+    public int GET_CATALOG_ITEM_RATE_LIMIT = 2;
+
+    public int GET_SEARCH_CATALOG_ITEMS_API_CALL = 2;
+    public int GET_SEARCH_CATALOG_ITEMS_LIMIT_REFRESH = 2000;
+    public int GET_SEARCH_CATALOG_ITEMS_RATE_LIMIT = 2;
 }

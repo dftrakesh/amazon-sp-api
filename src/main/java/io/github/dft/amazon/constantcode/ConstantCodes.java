@@ -32,6 +32,7 @@ public interface ConstantCodes {
     String  PRODUCTFEES_API_FEESESTIMATE_FOR_ASIN_V0 = "/products/fees/v0/items/%s/feesEstimate";
     String  PRODUCTFEES_API_MY_FEESESTIMATE_V0 = "/products/fees/v0/feesEstimate";
     String LWA_AUTHORIZATION_SERVER = "https://api.amazon.com/auth/o2/token";
+    String CATALOG_ITEMS_API_V202204 = "/catalog/2022-04-01/items/";
 
     String AWS_REGION_US_EAST_1 = "us-east-1";
     String AWS_REGION_US_WEST_1 = "us-west-2";
@@ -42,6 +43,4 @@ public interface ConstantCodes {
 
     int MAX_ATTEMPTS = 5000;
     int TIME_OUT_DURATION = 5000;
-
-
 }
