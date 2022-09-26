@@ -2,6 +2,7 @@ package io.github.dft.amazon;
 
 import com.amazonaws.http.HttpMethodName;
 import io.github.dft.amazon.constantcode.ConstantCodes;
+import io.github.dft.amazon.constantcode.RateLimitConstants;
 import io.github.dft.amazon.model.AccessCredentials;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
 import io.github.dft.amazon.model.tokens.v202103.CreateRestrictedDataTokenRequest;
@@ -13,12 +14,17 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.concurrent.CompletableFuture;
 
+import static io.github.dft.amazon.constantcode.ConstantCodes.MAX_ATTEMPTS;
+import static io.github.dft.amazon.constantcode.ConstantCodes.TIME_OUT_DURATION;
+
 public class AmazonSPTokens extends AmazonSellingPartnerSdk {
 
     private final HttpClient client;
+    private final RateLimitConstants rateLimitConstants;
 
     public AmazonSPTokens(AccessCredentials accessCredentials) {
         super(accessCredentials);
+        this.rateLimitConstants = new RateLimitConstants();
         client = HttpClient.newHttpClient();
     }
 
@@ -39,6 +45,11 @@ public class AmazonSPTokens extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<CreateRestrictedDataTokenResponse> handler = new JsonBodyHandler<>(CreateRestrictedDataTokenResponse.class);
+        rateLimitConstants.CREATE_RESTRICTED_DATA_TOKEN_API_CALL = setRateLimit(
+            rateLimitConstants.CREATE_RESTRICTED_DATA_TOKEN_API_CALL,
+            rateLimitConstants.CREATE_RESTRICTED_DATA_TOKEN_LIMIT_REFRESH,
+            rateLimitConstants.CREATE_RESTRICTED_DATA_TOKEN_RATE_LIMIT
+        );
         return getRequestWrapped(request, handler);
     }
 
@@ -58,11 +69,20 @@ public class AmazonSPTokens extends AmazonSellingPartnerSdk {
                                                             HttpResponse.BodyHandler<T> handler,
                                                             HttpResponse<T> resp, int count) {
 
-        if (resp.statusCode() == 429 && count < 5000) {
-            Thread.sleep(5000);
+        if (resp.statusCode() == 429 && count < MAX_ATTEMPTS) {
+            Thread.sleep(TIME_OUT_DURATION);
             return client.sendAsync(request, handler)
                 .thenComposeAsync(response -> tryResend(client, request, handler, response, count + 1));
         }
         return CompletableFuture.completedFuture(resp);
+    }
+
+    @SneakyThrows
+    public int setRateLimit(int apiCall, int limitRefreshPeriod, int rateLimit) {
+        if (apiCall <= 0) {
+            Thread.sleep(limitRefreshPeriod);
+            apiCall = rateLimit;
+        }
+        return apiCall - 1;
     }
 }

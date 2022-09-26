@@ -2,6 +2,7 @@ package io.github.dft.amazon;
 
 import com.amazonaws.http.HttpMethodName;
 import io.github.dft.amazon.constantcode.ConstantCodes;
+import io.github.dft.amazon.constantcode.RateLimitConstants;
 import io.github.dft.amazon.model.AccessCredentials;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
 import io.github.dft.amazon.model.reports.v202106.CancelResponse;
@@ -15,6 +16,7 @@ import io.github.dft.amazon.model.reports.v202106.ReportDocument;
 import io.github.dft.amazon.model.reports.v202106.ReportSchedule;
 import io.github.dft.amazon.model.reports.v202106.ReportScheduleList;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 
@@ -25,13 +27,18 @@ import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
+import static io.github.dft.amazon.constantcode.ConstantCodes.MAX_ATTEMPTS;
+import static io.github.dft.amazon.constantcode.ConstantCodes.TIME_OUT_DURATION;
+
 public class AmazonSPReports extends AmazonSellingPartnerSdk {
 
     private final HttpClient client;
+    private final RateLimitConstants rateLimitConstants;
 
     @SneakyThrows
     public AmazonSPReports(AccessCredentials accessCredentials) {
         super(accessCredentials);
+        this.rateLimitConstants = new RateLimitConstants();
         client = HttpClient.newHttpClient();
     }
 
@@ -57,7 +64,17 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<CreateReportResponse> handler = new JsonBodyHandler<>(CreateReportResponse.class);
-        return getRequestWrapped(request, handler);
+        rateLimitConstants.CREATE_REPORT_API_CALL = setRateLimit(
+            rateLimitConstants.CREATE_REPORT_API_CALL,
+            rateLimitConstants.CREATE_REPORT_LIMIT_REFRESH,
+            rateLimitConstants.CREATE_REPORT_RATE_LIMIT
+        );
+
+        return client
+            .sendAsync(request, handler)
+            .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
+            .get()
+            .body();
     }
 
     @SneakyThrows
@@ -81,7 +98,17 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<Report> handler = new JsonBodyHandler<>(Report.class);
-        return getRequestWrapped(request, handler);
+        rateLimitConstants.GET_REPORT_API_CALL = setRateLimit(
+            rateLimitConstants.GET_REPORT_API_CALL,
+            rateLimitConstants.GET_REPORT_LIMIT_REFRESH,
+            rateLimitConstants.GET_REPORT_RATE_LIMIT
+        );
+
+        return client
+            .sendAsync(request, handler)
+            .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
+            .get()
+            .body();
     }
 
     @SneakyThrows
@@ -106,6 +133,12 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<ReportDocument> handler = new JsonBodyHandler<>(ReportDocument.class);
+        rateLimitConstants.GET_REPORT_DOCUMENT = setRateLimit(
+            rateLimitConstants.GET_REPORT_DOCUMENT,
+            rateLimitConstants.GET_REPORT_DOCUMENT_LIMIT_REFRESH,
+            rateLimitConstants.GET_REPORT_DOCUMENT_RATE_LIMIT
+        );
+
         return getRequestWrapped(request, handler);
     }
 
@@ -137,7 +170,17 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<GetReportsResponse> handler = new JsonBodyHandler<>(GetReportsResponse.class);
-        return getRequestWrapped(request, handler);
+        rateLimitConstants.GET_REPORTS_API_CALL = setRateLimit(
+            rateLimitConstants.GET_REPORTS_API_CALL,
+            rateLimitConstants.GET_REPORTS_LIMIT_REFRESH,
+            rateLimitConstants.GET_REPORTS_RATE_LIMIT
+        );
+
+        return client
+            .sendAsync(request, handler)
+            .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
+            .get()
+            .body();
     }
 
     @SneakyThrows
@@ -162,6 +205,11 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<CancelResponse> handler = new JsonBodyHandler<>(CancelResponse.class);
+        rateLimitConstants.CANCEL_REPORT_API_CALL = setRateLimit(
+            rateLimitConstants.CANCEL_REPORT_API_CALL,
+            rateLimitConstants.CANCEL_REPORT_LIMIT_REFRESH,
+            rateLimitConstants.CANCEL_REPORT_RATE_LIMIT
+        );
         return getRequestWrapped(request, handler);
     }
 
@@ -181,6 +229,11 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .POST(HttpRequest.BodyPublishers.ofString(requestBody)).build();
 
         HttpResponse.BodyHandler<CreateReportScheduleResponse> handler = new JsonBodyHandler<>(CreateReportScheduleResponse.class);
+        rateLimitConstants.CREATE_REPORT_SCHEDULE_API_CALL = setRateLimit(
+            rateLimitConstants.CREATE_REPORT_SCHEDULE_API_CALL,
+            rateLimitConstants.CREATE_REPORT_SCHEDULE_LIMIT_REFRESH,
+            rateLimitConstants.CREATE_REPORT_SCHEDULE_RATE_LIMIT
+        );
         return getRequestWrapped(request, handler);
     }
 
@@ -205,6 +258,11 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<ReportSchedule> handler = new JsonBodyHandler<>(ReportSchedule.class);
+        rateLimitConstants.GET_REPORT_SCHEDULE_API_CALL = setRateLimit(
+            rateLimitConstants.GET_REPORT_SCHEDULE_API_CALL,
+            rateLimitConstants.GET_REPORT_SCHEDULE_LIMIT_REFRESH,
+            rateLimitConstants.GET_REPORT_SCHEDULE_RATE_LIMIT
+        );
         return getRequestWrapped(request, handler);
     }
 
@@ -232,6 +290,11 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE)).build();
 
         HttpResponse.BodyHandler<ReportScheduleList> handler = new JsonBodyHandler<>(ReportScheduleList.class);
+        rateLimitConstants.GET_REPORT_SCHEDULES_API_CALL = setRateLimit(
+            rateLimitConstants.GET_REPORT_SCHEDULES_API_CALL,
+            rateLimitConstants.GET_REPORT_SCHEDULES_LIMIT_REFRESH,
+            rateLimitConstants.GET_REPORT_SCHEDULES_RATE_LIMIT
+        );
         return getRequestWrapped(request, handler);
     }
 
@@ -258,6 +321,11 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<CancelResponse> handler = new JsonBodyHandler<>(CancelResponse.class);
+        rateLimitConstants.CANCEL_REPORT_SCHEDULE_API_CALL = setRateLimit(
+            rateLimitConstants.CANCEL_REPORT_SCHEDULE_API_CALL,
+            rateLimitConstants.CANCEL_REPORT_SCHEDULE_LIMIT_REFRESH,
+            rateLimitConstants.CANCEL_REPORT_SCHEDULE_RATE_LIMIT
+        );
         return getRequestWrapped(request, handler);
     }
 
@@ -277,11 +345,20 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
                                                             HttpResponse.BodyHandler<T> handler,
                                                             HttpResponse<T> resp, int count) {
 
-        if (resp.statusCode() == 429 && count < 5000) {
-            Thread.sleep(5000);
+        if (resp.statusCode() == 429 && count < MAX_ATTEMPTS) {
+            Thread.sleep(TIME_OUT_DURATION);
             return client.sendAsync(request, handler)
                 .thenComposeAsync(response -> tryResend(client, request, handler, response, count + 1));
         }
         return CompletableFuture.completedFuture(resp);
+    }
+
+    @SneakyThrows
+    public int setRateLimit(int apiCall, int limitRefreshPeriod, int rateLimit) {
+        if (apiCall <= 0) {
+            Thread.sleep(limitRefreshPeriod);
+            apiCall = rateLimit;
+        }
+        return apiCall - 1;
     }
 }
