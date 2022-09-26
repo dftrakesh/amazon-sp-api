@@ -13,5 +13,6 @@ import java.util.List;
 public class Attributes {
 
     private List<UnitCount> unitCount;
-    private List<ItemName> itemName;
+    private List<ItemValue> productDescription;
+    private List<ItemValue> itemValue;
 }
