@@ -13,6 +13,8 @@ import io.github.dft.amazon.model.AccessCredentials;
 import io.github.dft.amazon.model.auth.AccessTokenResponse;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
 import lombok.SneakyThrows;
+import org.apache.http.client.utils.URIBuilder;
+
 import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -23,6 +25,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
+
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class AmazonSellingPartnerSdk {
@@ -56,9 +59,9 @@ public class AmazonSellingPartnerSdk {
         refreshAccessToken();
         var basicAWSCredentials = new BasicAWSCredentials(accessCredentials.getAccessKeyId(), accessCredentials.getSecretAccessKey());
         var credentialsProvider = new STSAssumeRoleSessionCredentialsProvider.Builder(accessCredentials.getRoleArn(),
-            "rakesh")
-            .withStsClient(AWSSecurityTokenServiceClientBuilder.standard().withRegion(accessCredentials.getRegion()).
-                withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials)).build()).build();
+                "rakesh")
+                .withStsClient(AWSSecurityTokenServiceClientBuilder.standard().withRegion(accessCredentials.getRegion()).
+                        withCredentials(new AWSStaticCredentialsProvider(basicAWSCredentials)).build()).build();
 
 
         AWS4Signer signer = new AWS4Signer();
@@ -84,7 +87,7 @@ public class AmazonSellingPartnerSdk {
     }
 
     @SneakyThrows
-    public void refreshAccessToken() {
+    protected void refreshAccessToken() {
         if (accessCredentials.getAccessToken() == null || accessCredentials.getExpiresInTime() == null || ZonedDateTime.now(ZoneOffset.UTC).isAfter(accessCredentials.getExpiresInTime())) {
             Map<Object, Object> data = new HashMap<>();
             data.put(ConstantCodes.HTTP_OAUTH_PARAMETER_GRANT_TYPE, ConstantCodes.REFRESH_TOKEN);
@@ -93,14 +96,14 @@ public class AmazonSellingPartnerSdk {
             data.put(ConstantCodes.HTTP_OAUTH_PARAMETER_CLIENT_SECRET, accessCredentials.getClientSecret());
 
             HttpRequest request = HttpRequest.newBuilder(new URI(ConstantCodes.LWA_AUTHORIZATION_SERVER))
-                .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_FORM_URL_ENCODED)
-                .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
-                .POST(ofFormData(data))
-                .build();
+                    .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_FORM_URL_ENCODED)
+                    .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+                    .POST(ofFormData(data))
+                    .build();
 
             AccessTokenResponse accessTokenResponse = HttpClient.newHttpClient()
-                .send(request, new JsonBodyHandler<>(AccessTokenResponse.class))
-                .body();
+                    .send(request, new JsonBodyHandler<>(AccessTokenResponse.class))
+                    .body();
 
             accessCredentials.setAccessToken(accessTokenResponse.getAccessToken());
             accessCredentials.setRefreshToken(accessTokenResponse.getRefreshToken());
@@ -125,5 +128,12 @@ public class AmazonSellingPartnerSdk {
     @SneakyThrows
     protected String getString(Object body) {
         return objectMapper.writeValueAsString(body);
+    }
+
+    protected void addParameters(URIBuilder uriBuilder, HashMap<String, String> params) {
+        if (params == null || params.isEmpty()) return;
+        for (String key : params.keySet()) {
+            uriBuilder.addParameter(key, params.get(key));
+        }
     }
 }

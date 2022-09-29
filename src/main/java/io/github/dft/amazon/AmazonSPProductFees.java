@@ -22,6 +22,7 @@ public class AmazonSPProductFees extends AmazonSellingPartnerSdk {
 
     private final HttpClient client;
     private final RateLimitConstants rateLimitConstants;
+
     public AmazonSPProductFees(AccessCredentials accessCredentials) {
         super(accessCredentials);
         this.rateLimitConstants = new RateLimitConstants();

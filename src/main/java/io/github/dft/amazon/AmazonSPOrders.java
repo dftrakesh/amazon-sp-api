@@ -1,17 +1,12 @@
 package io.github.dft.amazon;
 
 import com.amazonaws.http.HttpMethodName;
+import com.google.common.util.concurrent.RateLimiter;
 import io.github.dft.amazon.constantcode.ConstantCodes;
 import io.github.dft.amazon.constantcode.RateLimitConstants;
 import io.github.dft.amazon.model.AccessCredentials;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
-import io.github.dft.amazon.model.orders.v0.GetOrderAddressResponse;
-import io.github.dft.amazon.model.orders.v0.GetOrderBuyerInfoResponse;
-import io.github.dft.amazon.model.orders.v0.GetOrderItemsBuyerInfoResponse;
-import io.github.dft.amazon.model.orders.v0.GetOrderItemsResponse;
-import io.github.dft.amazon.model.orders.v0.GetOrderRegulatedInfoResponse;
-import io.github.dft.amazon.model.orders.v0.GetOrderResponse;
-import io.github.dft.amazon.model.orders.v0.GetOrdersResponse;
+import io.github.dft.amazon.model.orders.v0.*;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
@@ -29,17 +24,17 @@ import static io.github.dft.amazon.constantcode.ConstantCodes.TIME_OUT_DURATION;
 public class AmazonSPOrders extends AmazonSellingPartnerSdk {
 
     private final HttpClient client;
-    private final RateLimitConstants rateLimitConstants;
+    private final RateLimiter rateLimiter;
 
     @SneakyThrows
     public AmazonSPOrders(AccessCredentials accessCredentials) {
         super(accessCredentials);
-        this.rateLimitConstants = new RateLimitConstants();
-        client = HttpClient.newHttpClient();
+        this.client = HttpClient.newHttpClient();
+        this.rateLimiter = RateLimiter.create(0.0167);
     }
 
     @SneakyThrows
-    public GetOrdersResponse getOrders(HashMap<String, String> params) {
+    GetOrdersResponse getOrders(HashMap<String, String> params) {
 
         final var signRequest = signRequest(ConstantCodes.ORDERS_API_V0, HttpMethodName.GET, params, null);
 
@@ -62,16 +57,12 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<GetOrdersResponse> handler = new JsonBodyHandler<>(GetOrdersResponse.class);
-        rateLimitConstants.GET_ORDERS_API_CALL = setRateLimit(
-            rateLimitConstants.GET_ORDERS_API_CALL,
-            rateLimitConstants.GET_ORDERS_LIMIT_REFRESH,
-            rateLimitConstants.GET_ORDERS_RATE_LIMIT
-        );
+
         return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
-    public GetOrderResponse getOrder(String orderId) {
+    GetOrderResponse getOrder(String orderId) {
         orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
 
         final var signRequest = signRequest(ConstantCodes.ORDER_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
@@ -87,16 +78,12 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<GetOrderResponse> handler = new JsonBodyHandler<>(GetOrderResponse.class);
-        rateLimitConstants.GET_ORDER_API_CALL = setRateLimit(
-            rateLimitConstants.GET_ORDER_API_CALL,
-            rateLimitConstants.GET_ORDER_LIMIT_REFRESH,
-            rateLimitConstants.GET_ORDER_RATE_LIMIT
-        );
+
         return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
-    public GetOrderBuyerInfoResponse getOrderBuyerInfo(String orderId) {
+    GetOrderBuyerInfoResponse getOrderBuyerInfo(String orderId) {
         orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
 
         final var signRequest = signRequest(ConstantCodes.ORDER_BUYER_INFO_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
@@ -112,16 +99,12 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<GetOrderBuyerInfoResponse> handler = new JsonBodyHandler<>(GetOrderBuyerInfoResponse.class);
-        rateLimitConstants.GET_ORDER_BUYER_INFO_API_CALL = setRateLimit(
-            rateLimitConstants.GET_ORDER_BUYER_INFO_API_CALL,
-            rateLimitConstants.GET_ORDER_BUYER_INFO_LIMIT_REFRESH,
-            rateLimitConstants.GET_ORDER_BUYER_INFO_RATE_LIMIT
-        );
+
         return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
-    public GetOrderAddressResponse getAddress(String orderId) {
+    GetOrderAddressResponse getAddress(String orderId) {
         orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
 
         final var signRequest = signRequest(ConstantCodes.ORDER_ADDRESS_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
@@ -137,16 +120,12 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<GetOrderAddressResponse> handler = new JsonBodyHandler<>(GetOrderAddressResponse.class);
-        rateLimitConstants.GET_ORDER_ADDRESS_API_CALL = setRateLimit(
-            rateLimitConstants.GET_ORDER_ADDRESS_API_CALL,
-            rateLimitConstants.GET_ORDER_ADDRESS_LIMIT_REFRESH,
-            rateLimitConstants.GET_ORDER_ADDRESS_RATE_LIMIT
-        );
+
         return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
-    public GetOrderItemsResponse getOrderItems(String orderId) {
+    GetOrderItemsResponse getOrderItems(String orderId) {
         orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
 
         final var signRequest = signRequest(ConstantCodes.ORDER_ITEMS_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
@@ -162,16 +141,12 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<GetOrderItemsResponse> handler = new JsonBodyHandler<>(GetOrderItemsResponse.class);
-        rateLimitConstants.GET_ORDER_ITEMS_API_CALL = setRateLimit(
-            rateLimitConstants.GET_ORDER_ITEMS_API_CALL,
-            rateLimitConstants.GET_ORDER_ITEMS_LIMIT_REFRESH,
-            rateLimitConstants.GET_ORDER_ITEMS_RATE_LIMIT
-        );
+
         return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
-    public GetOrderItemsBuyerInfoResponse getOrderItemsBuyerInfo(String orderId) {
+    GetOrderItemsBuyerInfoResponse getOrderItemsBuyerInfo(String orderId) {
         orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
 
         final var signRequest = signRequest(ConstantCodes.ORDER_ITEMS_BUYER_INFO_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
@@ -187,16 +162,12 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<GetOrderItemsBuyerInfoResponse> handler = new JsonBodyHandler<>(GetOrderItemsBuyerInfoResponse.class);
-        rateLimitConstants.GET_ORDER_ITEMS_BUYER_INFO_API_CALL = setRateLimit(
-            rateLimitConstants.GET_ORDER_ITEMS_BUYER_INFO_API_CALL,
-            rateLimitConstants.GET_ORDER_ITEMS_BUYER_INFO_LIMIT_REFRESH,
-            rateLimitConstants.GET_ORDER_ITEMS_BUYER_INFO_RATE_LIMIT
-        );
+
         return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
-    public GetOrderRegulatedInfoResponse getOrderRegulatedInfo(String orderId) {
+    GetOrderRegulatedInfoResponse getOrderRegulatedInfo(String orderId) {
         orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
 
         final var signRequest = signRequest(ConstantCodes.ORDER_REGULATED_INFO_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
@@ -212,17 +183,13 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<GetOrderRegulatedInfoResponse> handler = new JsonBodyHandler<>(GetOrderRegulatedInfoResponse.class);
-        rateLimitConstants.GET_ORDER_REGULATED_INFO_API_CALL = setRateLimit(
-            rateLimitConstants.GET_ORDER_REGULATED_INFO_API_CALL,
-            rateLimitConstants.GET_ORDER_REGULATED_INFO_LIMIT_REFRESH,
-            rateLimitConstants.GET_ORDER_REGULATED_INFO_RATE_LIMIT
-        );
+
         return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
     public <T> T getRequestWrapped(HttpRequest request, HttpResponse.BodyHandler<T> handler) {
-
+        rateLimiter.acquire();
         return client
             .sendAsync(request, handler)
             .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
@@ -235,6 +202,8 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
                                                             HttpRequest request,
                                                             HttpResponse.BodyHandler<T> handler,
                                                             HttpResponse<T> resp, int count) {
+        String limit  = resp.headers().firstValue("x-amzn-RateLimit-Limit").orElse(null);
+        System.out.println(limit);
 
         if (resp.statusCode() == 429 && count < MAX_ATTEMPTS) {
             Thread.sleep(TIME_OUT_DURATION);
@@ -244,12 +213,4 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
         return CompletableFuture.completedFuture(resp);
     }
 
-    @SneakyThrows
-    public int setRateLimit(int apiCall, int limitRefreshPeriod, int rateLimit) {
-        if (apiCall <= 0) {
-            Thread.sleep(limitRefreshPeriod);
-            apiCall = rateLimit;
-        }
-        return apiCall - 1;
-    }
 }

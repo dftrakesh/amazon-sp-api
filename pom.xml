@@ -6,7 +6,7 @@
 
     <groupId>io.github.dftrakesh</groupId>
     <artifactId>amazon-sp-api</artifactId>
-    <version>1.6</version>
+    <version>1.7</version>
     <packaging>jar</packaging>
 
 	<name>amazon-sp-api</name>
@@ -66,7 +66,11 @@
             <artifactId>sellingpartner-api-aa-java</artifactId>
             <version>2022.8.3</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>31.1-jre</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
