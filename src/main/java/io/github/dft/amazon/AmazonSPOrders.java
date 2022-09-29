@@ -30,7 +30,7 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
     public AmazonSPOrders(AccessCredentials accessCredentials) {
         super(accessCredentials);
         this.client = HttpClient.newHttpClient();
-        this.rateLimiter = RateLimiter.create(0.0167);
+        this.rateLimiter = RateLimiter.create(0.8);
     }
 
     @SneakyThrows
@@ -198,8 +198,6 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
                                                             HttpRequest request,
                                                             HttpResponse.BodyHandler<T> handler,
                                                             HttpResponse<T> resp, int count) {
-        String limit = resp.headers().firstValue("x-amzn-RateLimit-Limit").orElse(null);
-        System.out.println(limit);
 
         if (resp.statusCode() == 429 && count < MAX_ATTEMPTS) {
             Thread.sleep(TIME_OUT_DURATION);

@@ -42,5 +42,5 @@ public interface ConstantCodes {
     String X_AMZ_DATE = "X-Amz-Date" ;
 
     int MAX_ATTEMPTS = 50;
-    int TIME_OUT_DURATION = 5000;
+    int TIME_OUT_DURATION = 15000;
 }
