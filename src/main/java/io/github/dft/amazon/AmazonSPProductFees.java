@@ -7,6 +7,8 @@ import io.github.dft.amazon.model.AccessCredentials;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
 import io.github.dft.amazon.model.productfees.GetMyFeesEstimateResponse;
 import io.github.dft.amazon.model.productfees.GetMyFeesEstimatesRequest;
+import io.github.dft.amazon.model.productfees.GetMyFeesEstimatesRequestBody;
+import io.github.dft.amazon.model.productfees.GetMyFeesEstimatesResponse;
 import lombok.SneakyThrows;
 
 import java.net.URI;
@@ -56,7 +58,7 @@ public class AmazonSPProductFees extends AmazonSellingPartnerSdk {
     }
 
     @SneakyThrows
-    public GetMyFeesEstimateResponse getMyFeesEstimates(GetMyFeesEstimatesRequest body) {
+    public GetMyFeesEstimatesResponse getMyFeesEstimates(GetMyFeesEstimatesRequestBody body) {
 
         String requestBody = getString(body);
         final var signRequest = signRequest(ConstantCodes.PRODUCTFEES_API_MY_FEESESTIMATE_V0, HttpMethodName.POST, null, requestBody);
@@ -71,7 +73,7 @@ public class AmazonSPProductFees extends AmazonSellingPartnerSdk {
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
 
-        HttpResponse.BodyHandler<GetMyFeesEstimateResponse> handler = new JsonBodyHandler<>(GetMyFeesEstimateResponse.class);
+        HttpResponse.BodyHandler<GetMyFeesEstimatesResponse> handler = new JsonBodyHandler<>(GetMyFeesEstimatesResponse.class);
         rateLimitConstants.GET_MY_FEES_ESTIMATES_API_CALL = setRateLimit(
             rateLimitConstants.GET_MY_FEES_ESTIMATES_API_CALL,
             rateLimitConstants.GET_MY_FEES_ESTIMATES_LIMIT_REFRESH,
