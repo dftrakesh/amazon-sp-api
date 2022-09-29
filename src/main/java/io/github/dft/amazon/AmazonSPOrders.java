@@ -34,7 +34,7 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
     }
 
     @SneakyThrows
-    GetOrdersResponse getOrders(HashMap<String, String> params) {
+    public GetOrdersResponse getOrders(HashMap<String, String> params) {
 
         final var signRequest = signRequest(ConstantCodes.ORDERS_API_V0, HttpMethodName.GET, params, null);
 
@@ -58,7 +58,7 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
     }
 
     @SneakyThrows
-    GetOrderResponse getOrder(String orderId) {
+    public GetOrderResponse getOrder(String orderId) {
         orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
 
         final var signRequest = signRequest(ConstantCodes.ORDER_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
@@ -79,7 +79,7 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
     }
 
     @SneakyThrows
-    GetOrderBuyerInfoResponse getOrderBuyerInfo(String orderId) {
+    public GetOrderBuyerInfoResponse getOrderBuyerInfo(String orderId) {
         orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
 
         final var signRequest = signRequest(ConstantCodes.ORDER_BUYER_INFO_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
@@ -100,7 +100,7 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
     }
 
     @SneakyThrows
-    GetOrderAddressResponse getAddress(String orderId) {
+    public GetOrderAddressResponse getAddress(String orderId) {
         orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
 
         final var signRequest = signRequest(ConstantCodes.ORDER_ADDRESS_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
@@ -121,7 +121,7 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
     }
 
     @SneakyThrows
-    GetOrderItemsResponse getOrderItems(String orderId) {
+    public GetOrderItemsResponse getOrderItems(String orderId) {
         orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
 
         final var signRequest = signRequest(ConstantCodes.ORDER_ITEMS_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
@@ -142,7 +142,7 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
     }
 
     @SneakyThrows
-    GetOrderItemsBuyerInfoResponse getOrderItemsBuyerInfo(String orderId) {
+    public GetOrderItemsBuyerInfoResponse getOrderItemsBuyerInfo(String orderId) {
         orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
 
         final var signRequest = signRequest(ConstantCodes.ORDER_ITEMS_BUYER_INFO_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
@@ -163,7 +163,7 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
     }
 
     @SneakyThrows
-    GetOrderRegulatedInfoResponse getOrderRegulatedInfo(String orderId) {
+    public GetOrderRegulatedInfoResponse getOrderRegulatedInfo(String orderId) {
         orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
 
         final var signRequest = signRequest(ConstantCodes.ORDER_REGULATED_INFO_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
