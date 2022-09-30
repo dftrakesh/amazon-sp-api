@@ -1,6 +1,7 @@
 package io.github.dft.amazon;
 
 import com.amazonaws.http.HttpMethodName;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.dft.amazon.constantcode.ConstantCodes;
 import io.github.dft.amazon.constantcode.RateLimitConstants;
 import io.github.dft.amazon.model.AccessCredentials;
@@ -73,13 +74,15 @@ public class AmazonSPProductFees extends AmazonSellingPartnerSdk {
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
 
-        HttpResponse.BodyHandler<GetMyFeesEstimatesResponse> handler = new JsonBodyHandler<>(GetMyFeesEstimatesResponse.class);
+        HttpResponse.BodyHandler<Object> handler = new JsonBodyHandler<>(Object.class);
         rateLimitConstants.GET_MY_FEES_ESTIMATES_API_CALL = setRateLimit(
             rateLimitConstants.GET_MY_FEES_ESTIMATES_API_CALL,
             rateLimitConstants.GET_MY_FEES_ESTIMATES_LIMIT_REFRESH,
             rateLimitConstants.GET_MY_FEES_ESTIMATES_RATE_LIMIT
         );
-        return getRequestWrapped(request, handler);
+        final var response = getRequestWrapped(request, handler);
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.convertValue(response, GetMyFeesEstimatesResponse.class);
     }
 
 
