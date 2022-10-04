@@ -1,8 +1,8 @@
 package io.github.dft.amazon;
 
 import com.amazonaws.http.HttpMethodName;
+import com.google.common.util.concurrent.RateLimiter;
 import io.github.dft.amazon.constantcode.ConstantCodes;
-import io.github.dft.amazon.constantcode.RateLimitConstants;
 import io.github.dft.amazon.model.AccessCredentials;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
 import io.github.dft.amazon.model.sellersapi.v1.GetMarketplaceParticipationsResponse;
@@ -20,12 +20,12 @@ import static io.github.dft.amazon.constantcode.ConstantCodes.TIME_OUT_DURATION;
 public class AmazonSPSellers extends AmazonSellingPartnerSdk {
 
     private final HttpClient client;
-    private final RateLimitConstants rateLimitConstants;
+    private final RateLimiter rateLimiter;
 
     @SneakyThrows
     public AmazonSPSellers(AccessCredentials accessCredentials) {
         super(accessCredentials);
-        this.rateLimitConstants = new RateLimitConstants();
+        this.rateLimiter = RateLimiter.create(0.5);
         client = HttpClient.newHttpClient();
     }
 
@@ -44,18 +44,13 @@ public class AmazonSPSellers extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<GetMarketplaceParticipationsResponse> handler = new JsonBodyHandler<>(GetMarketplaceParticipationsResponse.class);
-        rateLimitConstants.GET_MARKETPLACE_PARTICIPATION_API_CALL = setRateLimit(
-            rateLimitConstants.GET_MARKETPLACE_PARTICIPATION_API_CALL,
-            rateLimitConstants.GET_MARKETPLACE_PARTICIPATION_LIMIT_REFRESH,
-            rateLimitConstants.GET_MARKETPLACE_PARTICIPATION_RATE_LIMIT
-        );
 
         return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
     public <T> T getRequestWrapped(HttpRequest request, HttpResponse.BodyHandler<T> handler) {
-
+        rateLimiter.acquire();
         return client
             .sendAsync(request, handler)
             .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
@@ -75,14 +70,5 @@ public class AmazonSPSellers extends AmazonSellingPartnerSdk {
                 .thenComposeAsync(response -> tryResend(client, request, handler, response, count + 1));
         }
         return CompletableFuture.completedFuture(resp);
-    }
-
-    @SneakyThrows
-    public int setRateLimit(int apiCall, int limitRefreshPeriod, int rateLimit) {
-        if (apiCall <= 0) {
-            Thread.sleep(limitRefreshPeriod);
-            apiCall = rateLimit;
-        }
-        return apiCall - 1;
     }
 }

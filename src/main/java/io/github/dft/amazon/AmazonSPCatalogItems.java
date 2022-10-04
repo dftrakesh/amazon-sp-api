@@ -1,8 +1,8 @@
 package io.github.dft.amazon;
 
 import com.amazonaws.http.HttpMethodName;
+import com.google.common.util.concurrent.RateLimiter;
 import io.github.dft.amazon.constantcode.ConstantCodes;
-import io.github.dft.amazon.constantcode.RateLimitConstants;
 import io.github.dft.amazon.model.AccessCredentials;
 import io.github.dft.amazon.model.catalogitems.v202204.Item;
 import io.github.dft.amazon.model.catalogitems.v202204.ItemSearchResults;
@@ -23,11 +23,11 @@ import static io.github.dft.amazon.constantcode.ConstantCodes.TIME_OUT_DURATION;
 public class AmazonSPCatalogItems extends AmazonSellingPartnerSdk {
 
     private final HttpClient client;
-    private final RateLimitConstants rateLimitConstants;
+    private final RateLimiter rateLimiter;
 
     public AmazonSPCatalogItems(AccessCredentials accessCredentials) {
         super(accessCredentials);
-        this.rateLimitConstants = new RateLimitConstants();
+        this.rateLimiter = RateLimiter.create(2);
         client = HttpClient.newHttpClient();
     }
 
@@ -55,11 +55,6 @@ public class AmazonSPCatalogItems extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<Item> handler = new JsonBodyHandler<>(Item.class);
-        rateLimitConstants.GET_CATALOG_ITEM_API_CALL = setRateLimit(
-            rateLimitConstants.GET_CATALOG_ITEM_API_CALL,
-            rateLimitConstants.GET_CATALOG_ITEM_LIMIT_REFRESH,
-            rateLimitConstants.GET_CATALOG_ITEM_RATE_LIMIT
-        );
         return getRequestWrapped(request, handler);
     }
 
@@ -87,17 +82,12 @@ public class AmazonSPCatalogItems extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<ItemSearchResults> handler = new JsonBodyHandler<>(ItemSearchResults.class);
-        rateLimitConstants.GET_SEARCH_CATALOG_ITEMS_API_CALL = setRateLimit(
-            rateLimitConstants.GET_SEARCH_CATALOG_ITEMS_API_CALL,
-            rateLimitConstants.GET_SEARCH_CATALOG_ITEMS_LIMIT_REFRESH,
-            rateLimitConstants.GET_SEARCH_CATALOG_ITEMS_RATE_LIMIT
-        );
         return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
     private <T> T getRequestWrapped(HttpRequest request, HttpResponse.BodyHandler<T> handler) {
-
+        rateLimiter.acquire();
         return client
             .sendAsync(request, handler)
             .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
@@ -117,14 +107,5 @@ public class AmazonSPCatalogItems extends AmazonSellingPartnerSdk {
                 .thenComposeAsync(response -> tryResend(client, request, handler, response, count + 1));
         }
         return CompletableFuture.completedFuture(resp);
-    }
-
-    @SneakyThrows
-    private int setRateLimit(int apiCall, int limitRefreshPeriod, int rateLimit) {
-        if (apiCall <= 0) {
-            Thread.sleep(limitRefreshPeriod);
-            apiCall = rateLimit;
-        }
-        return apiCall - 1;
     }
 }

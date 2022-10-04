@@ -1,13 +1,14 @@
 package io.github.dft.amazon;
 
 import com.amazonaws.http.HttpMethodName;
+import com.google.common.util.concurrent.RateLimiter;
 import io.github.dft.amazon.constantcode.ConstantCodes;
-import io.github.dft.amazon.constantcode.RateLimitConstants;
 import io.github.dft.amazon.model.AccessCredentials;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
 import io.github.dft.amazon.model.tokens.v202103.CreateRestrictedDataTokenRequest;
 import io.github.dft.amazon.model.tokens.v202103.CreateRestrictedDataTokenResponse;
 import lombok.SneakyThrows;
+
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -20,11 +21,11 @@ import static io.github.dft.amazon.constantcode.ConstantCodes.TIME_OUT_DURATION;
 public class AmazonSPTokens extends AmazonSellingPartnerSdk {
 
     private final HttpClient client;
-    private final RateLimitConstants rateLimitConstants;
+    private final RateLimiter rateLimiter;
 
     public AmazonSPTokens(AccessCredentials accessCredentials) {
         super(accessCredentials);
-        this.rateLimitConstants = new RateLimitConstants();
+        this.rateLimiter = RateLimiter.create(1);
         client = HttpClient.newHttpClient();
     }
 
@@ -32,7 +33,7 @@ public class AmazonSPTokens extends AmazonSellingPartnerSdk {
     public CreateRestrictedDataTokenResponse createRestrictedDataToken(CreateRestrictedDataTokenRequest body) {
         String requestBody = getString(body);
 
-        final var signRequest = signRequest(ConstantCodes.TOKENS_API_V202103, HttpMethodName.POST, null,requestBody);
+        final var signRequest = signRequest(ConstantCodes.TOKENS_API_V202103, HttpMethodName.POST, null, requestBody);
 
         HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.TOKENS_API_V202103))
             .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
@@ -45,17 +46,12 @@ public class AmazonSPTokens extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<CreateRestrictedDataTokenResponse> handler = new JsonBodyHandler<>(CreateRestrictedDataTokenResponse.class);
-        rateLimitConstants.CREATE_RESTRICTED_DATA_TOKEN_API_CALL = setRateLimit(
-            rateLimitConstants.CREATE_RESTRICTED_DATA_TOKEN_API_CALL,
-            rateLimitConstants.CREATE_RESTRICTED_DATA_TOKEN_LIMIT_REFRESH,
-            rateLimitConstants.CREATE_RESTRICTED_DATA_TOKEN_RATE_LIMIT
-        );
         return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
     public <T> T getRequestWrapped(HttpRequest request, HttpResponse.BodyHandler<T> handler) {
-
+        rateLimiter.acquire();
         return client
             .sendAsync(request, handler)
             .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
@@ -75,14 +71,5 @@ public class AmazonSPTokens extends AmazonSellingPartnerSdk {
                 .thenComposeAsync(response -> tryResend(client, request, handler, response, count + 1));
         }
         return CompletableFuture.completedFuture(resp);
-    }
-
-    @SneakyThrows
-    public int setRateLimit(int apiCall, int limitRefreshPeriod, int rateLimit) {
-        if (apiCall <= 0) {
-            Thread.sleep(limitRefreshPeriod);
-            apiCall = rateLimit;
-        }
-        return apiCall - 1;
     }
 }

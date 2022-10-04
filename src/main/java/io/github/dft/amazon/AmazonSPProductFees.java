@@ -2,14 +2,16 @@ package io.github.dft.amazon;
 
 import com.amazonaws.http.HttpMethodName;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.util.concurrent.RateLimiter;
 import io.github.dft.amazon.constantcode.ConstantCodes;
-import io.github.dft.amazon.constantcode.RateLimitConstants;
 import io.github.dft.amazon.model.AccessCredentials;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
 import io.github.dft.amazon.model.productfees.GetMyFeesEstimateResponse;
+import io.github.dft.amazon.model.productfees.GetMyFeesEstimateResults;
 import io.github.dft.amazon.model.productfees.GetMyFeesEstimatesRequest;
 import io.github.dft.amazon.model.productfees.GetMyFeesEstimatesRequestBody;
 import io.github.dft.amazon.model.productfees.GetMyFeesEstimatesResponse;
+import io.github.dft.amazon.model.reports.v202106.ErrorList;
 import lombok.SneakyThrows;
 
 import java.net.URI;
@@ -24,11 +26,11 @@ import static io.github.dft.amazon.constantcode.ConstantCodes.TIME_OUT_DURATION;
 public class AmazonSPProductFees extends AmazonSellingPartnerSdk {
 
     private final HttpClient client;
-    private final RateLimitConstants rateLimitConstants;
+    private final RateLimiter rateLimiter;
 
     public AmazonSPProductFees(AccessCredentials accessCredentials) {
         super(accessCredentials);
-        this.rateLimitConstants = new RateLimitConstants();
+        this.rateLimiter = RateLimiter.create(0.5);
         this.client = HttpClient.newHttpClient();
     }
 
@@ -40,21 +42,17 @@ public class AmazonSPProductFees extends AmazonSellingPartnerSdk {
         final var signRequest = signRequest(finalPath, HttpMethodName.POST, null, requestBody);
 
         HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + finalPath))
-                .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
-                .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
-                .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
-                .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
-                .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
-                .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                .build();
+            .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+            .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+            .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
+            .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
+            .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
+            .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
+            .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+            .build();
 
         HttpResponse.BodyHandler<GetMyFeesEstimateResponse> handler = new JsonBodyHandler<>(GetMyFeesEstimateResponse.class);
-        rateLimitConstants.GET_MY_FEES_ESTIMATE_FOR_SKU_API_CALL = setRateLimit(
-            rateLimitConstants.GET_MY_FEES_ESTIMATE_FOR_SKU_API_CALL,
-            rateLimitConstants.GET_MY_FEES_ESTIMATE_FOR_SKU_LIMIT_REFRESH,
-            rateLimitConstants.GET_MY_FEES_ESTIMATE_FOR_SKU_RATE_LIMIT
-        );
+
         return getRequestWrapped(request, handler);
     }
 
@@ -65,26 +63,28 @@ public class AmazonSPProductFees extends AmazonSellingPartnerSdk {
         final var signRequest = signRequest(ConstantCodes.PRODUCTFEES_API_MY_FEESESTIMATE_V0, HttpMethodName.POST, null, requestBody);
 
         HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.PRODUCTFEES_API_MY_FEESESTIMATE_V0))
-                .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
-                .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
-                .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
-                .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
-                .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
-                .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                .build();
+            .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+            .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+            .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
+            .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
+            .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
+            .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
+            .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+            .build();
 
         HttpResponse.BodyHandler<Object> handler = new JsonBodyHandler<>(Object.class);
-        rateLimitConstants.GET_MY_FEES_ESTIMATES_API_CALL = setRateLimit(
-            rateLimitConstants.GET_MY_FEES_ESTIMATES_API_CALL,
-            rateLimitConstants.GET_MY_FEES_ESTIMATES_LIMIT_REFRESH,
-            rateLimitConstants.GET_MY_FEES_ESTIMATES_RATE_LIMIT
-        );
+
         final var response = getRequestWrapped(request, handler);
         ObjectMapper objectMapper = new ObjectMapper();
+        if (!response.getClass().getSimpleName().equalsIgnoreCase("ArrayList")) {
+            final var results = new GetMyFeesEstimateResults();
+            final var res = new GetMyFeesEstimatesResponse();
+            results.setErrors(objectMapper.convertValue(response, ErrorList.class));
+            res.add(results);
+            return res;
+        }
         return objectMapper.convertValue(response, GetMyFeesEstimatesResponse.class);
     }
-
 
     @SneakyThrows
     public GetMyFeesEstimateResponse getMyFeesEstimateForASIN(String asin, GetMyFeesEstimatesRequest body) {
@@ -95,27 +95,22 @@ public class AmazonSPProductFees extends AmazonSellingPartnerSdk {
         final var signRequest = signRequest(finalPath, HttpMethodName.POST, null, requestBody);
 
         HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + finalPath))
-                .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
-                .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
-                .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
-                .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
-                .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
-                .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                .build();
+            .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+            .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+            .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
+            .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
+            .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
+            .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
+            .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+            .build();
 
         HttpResponse.BodyHandler<GetMyFeesEstimateResponse> handler = new JsonBodyHandler<>(GetMyFeesEstimateResponse.class);
-        rateLimitConstants.GET_MY_FEES_ESTIMATE_API_CALL = setRateLimit(
-            rateLimitConstants.GET_MY_FEES_ESTIMATE_API_CALL,
-            rateLimitConstants.GET_MY_FEES_ESTIMATE_LIMIT_REFRESH,
-            rateLimitConstants.GET_MY_FEES_ESTIMATE_RATE_LIMIT
-        );
         return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
     public <T> T getRequestWrapped(HttpRequest request, HttpResponse.BodyHandler<T> handler) {
-
+        rateLimiter.acquire();
         return client
             .sendAsync(request, handler)
             .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
@@ -135,14 +130,5 @@ public class AmazonSPProductFees extends AmazonSellingPartnerSdk {
                 .thenComposeAsync(response -> tryResend(client, request, handler, response, count + 1));
         }
         return CompletableFuture.completedFuture(resp);
-    }
-
-    @SneakyThrows
-    public int setRateLimit(int apiCall, int limitRefreshPeriod, int rateLimit) {
-        if (apiCall <= 0) {
-            Thread.sleep(limitRefreshPeriod);
-            apiCall = rateLimit;
-        }
-        return apiCall - 1;
     }
 }
