@@ -1,48 +1,24 @@
 package io.github.dft.amazon;
 
 import com.amazonaws.http.HttpMethodName;
-import com.google.common.util.concurrent.RateLimiter;
 import io.github.dft.amazon.constantcode.ConstantCodes;
 import io.github.dft.amazon.model.AccessCredentials;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
-import io.github.dft.amazon.model.reports.v202106.CancelResponse;
-import io.github.dft.amazon.model.reports.v202106.CreateReportResponse;
-import io.github.dft.amazon.model.reports.v202106.CreateReportScheduleResponse;
-import io.github.dft.amazon.model.reports.v202106.CreateReportScheduleSpecification;
-import io.github.dft.amazon.model.reports.v202106.CreateReportSpecification;
-import io.github.dft.amazon.model.reports.v202106.GetReportsResponse;
-import io.github.dft.amazon.model.reports.v202106.Report;
-import io.github.dft.amazon.model.reports.v202106.ReportDocument;
-import io.github.dft.amazon.model.reports.v202106.ReportSchedule;
-import io.github.dft.amazon.model.reports.v202106.ReportScheduleList;
+import io.github.dft.amazon.model.reports.v202106.*;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
-import java.util.concurrent.CompletableFuture;
-
-import static io.github.dft.amazon.constantcode.ConstantCodes.MAX_ATTEMPTS;
-import static io.github.dft.amazon.constantcode.ConstantCodes.TIME_OUT_DURATION;
 
 public class AmazonSPReports extends AmazonSellingPartnerSdk {
-
-    private final HttpClient client;
-    private final RateLimiter rateLimiter02;
-    private final RateLimiter rateLimiter01;
-    private final RateLimiter rateLimiter2;
 
     @SneakyThrows
     public AmazonSPReports(AccessCredentials accessCredentials) {
         super(accessCredentials);
-        this.rateLimiter02 = RateLimiter.create(0.0222);
-        this.rateLimiter01 = RateLimiter.create(0.0167);
-        this.rateLimiter2 = RateLimiter.create(2);
-        client = HttpClient.newHttpClient();
     }
 
     @SneakyThrows
@@ -67,8 +43,11 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<CreateReportResponse> handler = new JsonBodyHandler<>(CreateReportResponse.class);
-
-        return getRequestWrapped(request, handler, rateLimiter01);
+        return client
+            .sendAsync(request, handler)
+            .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
+            .get()
+            .body();
     }
 
     @SneakyThrows
@@ -92,8 +71,11 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<Report> handler = new JsonBodyHandler<>(Report.class);
-
-        return getRequestWrapped(request, handler, rateLimiter2);
+        return client
+            .sendAsync(request, handler)
+            .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
+            .get()
+            .body();
     }
 
     @SneakyThrows
@@ -118,8 +100,7 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<ReportDocument> handler = new JsonBodyHandler<>(ReportDocument.class);
-
-        return getRequestWrapped(request, handler, rateLimiter01);
+        return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
@@ -150,8 +131,11 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<GetReportsResponse> handler = new JsonBodyHandler<>(GetReportsResponse.class);
-
-        return getRequestWrapped(request, handler, rateLimiter02);
+        return client
+            .sendAsync(request, handler)
+            .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
+            .get()
+            .body();
     }
 
     @SneakyThrows
@@ -176,8 +160,7 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<CancelResponse> handler = new JsonBodyHandler<>(CancelResponse.class);
-
-        return getRequestWrapped(request, handler, rateLimiter02);
+        return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
@@ -196,8 +179,7 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .POST(HttpRequest.BodyPublishers.ofString(requestBody)).build();
 
         HttpResponse.BodyHandler<CreateReportScheduleResponse> handler = new JsonBodyHandler<>(CreateReportScheduleResponse.class);
-
-        return getRequestWrapped(request, handler, rateLimiter02);
+        return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
@@ -221,8 +203,7 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<ReportSchedule> handler = new JsonBodyHandler<>(ReportSchedule.class);
-
-        return getRequestWrapped(request, handler, rateLimiter02);
+        return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
@@ -249,8 +230,7 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE)).build();
 
         HttpResponse.BodyHandler<ReportScheduleList> handler = new JsonBodyHandler<>(ReportScheduleList.class);
-
-        return getRequestWrapped(request, handler, rateLimiter02);
+        return getRequestWrapped(request, handler);
     }
 
     @SneakyThrows
@@ -276,31 +256,7 @@ public class AmazonSPReports extends AmazonSellingPartnerSdk {
             .build();
 
         HttpResponse.BodyHandler<CancelResponse> handler = new JsonBodyHandler<>(CancelResponse.class);
-
-        return getRequestWrapped(request, handler, rateLimiter02);
+        return getRequestWrapped(request, handler);
     }
 
-    @SneakyThrows
-    public <T> T getRequestWrapped(HttpRequest request, HttpResponse.BodyHandler<T> handler, RateLimiter rateLimiter) {
-        rateLimiter.acquire();
-        return client
-            .sendAsync(request, handler)
-            .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
-            .get()
-            .body();
-    }
-
-    @SneakyThrows
-    public <T> CompletableFuture<HttpResponse<T>> tryResend(HttpClient client,
-                                                            HttpRequest request,
-                                                            HttpResponse.BodyHandler<T> handler,
-                                                            HttpResponse<T> resp, int count) {
-
-        if (resp.statusCode() == 429 && count < MAX_ATTEMPTS) {
-            Thread.sleep(TIME_OUT_DURATION);
-            return client.sendAsync(request, handler)
-                .thenComposeAsync(response -> tryResend(client, request, handler, response, count + 1));
-        }
-        return CompletableFuture.completedFuture(resp);
-    }
 }

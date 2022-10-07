@@ -2,39 +2,47 @@ package io.github.dft.amazon;
 
 import com.amazonaws.http.HttpMethodName;
 import io.github.dft.amazon.constantcode.ConstantCodes;
+import io.github.dft.amazon.constantcode.RateLimitConstants;
 import io.github.dft.amazon.model.AccessCredentials;
+import io.github.dft.amazon.model.feeds.v20210630.GetFeedsResponse;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
-import io.github.dft.amazon.model.tokens.v202103.CreateRestrictedDataTokenRequest;
-import io.github.dft.amazon.model.tokens.v202103.CreateRestrictedDataTokenResponse;
+import io.github.dft.amazon.model.sellersapi.v1.GetMarketplaceParticipationsResponse;
 import lombok.SneakyThrows;
 
 import java.net.URI;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 
-public class AmazonSPTokens extends AmazonSellingPartnerSdk {
+import static io.github.dft.amazon.constantcode.ConstantCodes.MAX_ATTEMPTS;
+import static io.github.dft.amazon.constantcode.ConstantCodes.TIME_OUT_DURATION;
 
-    public AmazonSPTokens(AccessCredentials accessCredentials) {
+public class AmazonSPFeeds extends AmazonSellingPartnerSdk {
+
+
+    @SneakyThrows
+    public AmazonSPFeeds(AccessCredentials accessCredentials) {
         super(accessCredentials);
     }
 
     @SneakyThrows
-    public CreateRestrictedDataTokenResponse createRestrictedDataToken(CreateRestrictedDataTokenRequest body) {
-        String requestBody = getString(body);
+    public GetFeedsResponse getFeeds(HashMap<String, String> params) {
 
-        final var signRequest = signRequest(ConstantCodes.TOKENS_API_V202103, HttpMethodName.POST, null,requestBody);
+        final var signRequest = signRequest(ConstantCodes.FEEDS_API_V20160630, HttpMethodName.GET, params, null);
 
-        HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.TOKENS_API_V202103))
+        HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.FEEDS_API_V20160630))
             .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
             .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
             .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
             .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
             .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
             .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
-            .POST(HttpRequest.BodyPublishers.ofString(requestBody))
             .build();
 
-        HttpResponse.BodyHandler<CreateRestrictedDataTokenResponse> handler = new JsonBodyHandler<>(CreateRestrictedDataTokenResponse.class);
+        HttpResponse.BodyHandler<GetFeedsResponse> handler = new JsonBodyHandler<>(GetFeedsResponse.class);
+
         return getRequestWrapped(request, handler);
     }
 
