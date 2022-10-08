@@ -1,7 +1,6 @@
 package io.github.dft.amazon;
 
 import com.amazonaws.http.HttpMethodName;
-import com.google.common.util.concurrent.RateLimiter;
 import io.github.dft.amazon.constantcode.ConstantCodes;
 import io.github.dft.amazon.model.AccessCredentials;
 import io.github.dft.amazon.model.catalogitems.v202204.Item;
@@ -11,24 +10,14 @@ import lombok.SneakyThrows;
 import org.apache.http.client.utils.URIBuilder;
 
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
-import java.util.concurrent.CompletableFuture;
-
-import static io.github.dft.amazon.constantcode.ConstantCodes.MAX_ATTEMPTS;
-import static io.github.dft.amazon.constantcode.ConstantCodes.TIME_OUT_DURATION;
 
 public class AmazonSPCatalogItems extends AmazonSellingPartnerSdk {
 
-    private final HttpClient client;
-    private final RateLimiter rateLimiter;
-
     public AmazonSPCatalogItems(AccessCredentials accessCredentials) {
         super(accessCredentials);
-        this.rateLimiter = RateLimiter.create(2);
-        client = HttpClient.newHttpClient();
     }
 
     @SneakyThrows
@@ -83,29 +72,5 @@ public class AmazonSPCatalogItems extends AmazonSellingPartnerSdk {
 
         HttpResponse.BodyHandler<ItemSearchResults> handler = new JsonBodyHandler<>(ItemSearchResults.class);
         return getRequestWrapped(request, handler);
-    }
-
-    @SneakyThrows
-    private <T> T getRequestWrapped(HttpRequest request, HttpResponse.BodyHandler<T> handler) {
-        rateLimiter.acquire();
-        return client
-            .sendAsync(request, handler)
-            .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
-            .get()
-            .body();
-    }
-
-    @SneakyThrows
-    private <T> CompletableFuture<HttpResponse<T>> tryResend(HttpClient client,
-                                                             HttpRequest request,
-                                                             HttpResponse.BodyHandler<T> handler,
-                                                             HttpResponse<T> resp, int count) {
-
-        if (resp.statusCode() == 429 && count < MAX_ATTEMPTS) {
-            Thread.sleep(TIME_OUT_DURATION);
-            return client.sendAsync(request, handler)
-                .thenComposeAsync(response -> tryResend(client, request, handler, response, count + 1));
-        }
-        return CompletableFuture.completedFuture(resp);
     }
 }

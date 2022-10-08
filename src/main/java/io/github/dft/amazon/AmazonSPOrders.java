@@ -23,13 +23,11 @@ import static io.github.dft.amazon.constantcode.ConstantCodes.TIME_OUT_DURATION;
 
 public class AmazonSPOrders extends AmazonSellingPartnerSdk {
 
-    private final HttpClient client;
     private final RateLimiter rateLimiter;
 
     @SneakyThrows
     public AmazonSPOrders(AccessCredentials accessCredentials) {
         super(accessCredentials);
-        this.client = HttpClient.newHttpClient();
         this.rateLimiter = RateLimiter.create(0.8);
     }
 
@@ -181,30 +179,6 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
         HttpResponse.BodyHandler<GetOrderRegulatedInfoResponse> handler = new JsonBodyHandler<>(GetOrderRegulatedInfoResponse.class);
 
         return getRequestWrapped(request, handler);
-    }
-
-    @SneakyThrows
-    public <T> T getRequestWrapped(HttpRequest request, HttpResponse.BodyHandler<T> handler) {
-        rateLimiter.acquire();
-        return client
-                .sendAsync(request, handler)
-                .thenComposeAsync(response -> tryResend(client, request, handler, response, 1))
-                .get()
-                .body();
-    }
-
-    @SneakyThrows
-    public <T> CompletableFuture<HttpResponse<T>> tryResend(HttpClient client,
-                                                            HttpRequest request,
-                                                            HttpResponse.BodyHandler<T> handler,
-                                                            HttpResponse<T> resp, int count) {
-
-        if (resp.statusCode() == 429 && count < MAX_ATTEMPTS) {
-            Thread.sleep(TIME_OUT_DURATION);
-            return client.sendAsync(request, handler)
-                    .thenComposeAsync(response -> tryResend(client, request, handler, response, count + 1));
-        }
-        return CompletableFuture.completedFuture(resp);
     }
 
 }

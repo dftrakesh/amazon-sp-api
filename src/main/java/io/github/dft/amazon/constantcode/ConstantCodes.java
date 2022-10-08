@@ -17,6 +17,7 @@ public interface ConstantCodes {
     String HTTP_HEADER_VALUE_APPLICATION_FORM_URL_ENCODED = "application/x-www-form-urlencoded";
 
     String SELLERS_API_V1 = "/sellers/v1/marketplaceParticipations";
+    String FEEDS_API_V20160630 = "/feeds/2021-06-30/feeds";
     String REPORTS_API_V202106 = "/reports/2021-06-30/reports";
     String REPORT_DOCUMENTS_API_V202106 = "/reports/2021-06-30/documents";
     String REPORT_SCHEDULES_API_V202106 = "/reports/2021-06-30/schedules";
