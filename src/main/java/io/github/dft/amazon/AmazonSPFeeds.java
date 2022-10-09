@@ -4,12 +4,17 @@ import com.amazonaws.http.HttpMethodName;
 import io.github.dft.amazon.constantcode.ConstantCodes;
 import io.github.dft.amazon.constantcode.RateLimitConstants;
 import io.github.dft.amazon.model.AccessCredentials;
+import io.github.dft.amazon.model.feeds.v20210630.CreateFeedDocumentResponse;
+import io.github.dft.amazon.model.feeds.v20210630.CreateFeedDocumentSpecification;
+import io.github.dft.amazon.model.feeds.v20210630.CreateFeedSpecification;
 import io.github.dft.amazon.model.feeds.v20210630.GetFeedsResponse;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
 import io.github.dft.amazon.model.sellersapi.v1.GetMarketplaceParticipationsResponse;
 import lombok.SneakyThrows;
 import org.apache.http.client.utils.URIBuilder;
 
+import java.io.InputStream;
+import java.io.Reader;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -52,12 +57,12 @@ public class AmazonSPFeeds extends AmazonSellingPartnerSdk {
     }
 
     @SneakyThrows
-    public GetFeedsResponse createFeedDocument(HashMap<String, String> params) {
+    public CreateFeedDocumentResponse createFeedDocument(CreateFeedDocumentSpecification createFeedDocumentSpecification) {
 
-        final var signRequest = signRequest(ConstantCodes.FEEDS_API_V20160630, HttpMethodName.GET, params, null);
+        String requestBody = getString(createFeedDocumentSpecification);
+        final var signRequest = signRequest(ConstantCodes.FEEDS_API_V20160630_CREATE_FEED_DOCUMENT, HttpMethodName.POST, null, requestBody);
 
-        URIBuilder uriBuilder = new URIBuilder(sellingRegionEndpoint + ConstantCodes.FEEDS_API_V20160630);
-        addParameters(uriBuilder, params);
+        URIBuilder uriBuilder = new URIBuilder(sellingRegionEndpoint + ConstantCodes.FEEDS_API_V20160630_CREATE_FEED_DOCUMENT);
         URI uri = uriBuilder.build();
 
         HttpRequest request = HttpRequest.newBuilder(uri)
@@ -67,10 +72,41 @@ public class AmazonSPFeeds extends AmazonSellingPartnerSdk {
                 .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
                 .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
                 .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
 
-        HttpResponse.BodyHandler<GetFeedsResponse> handler = new JsonBodyHandler<>(GetFeedsResponse.class);
+        HttpResponse.BodyHandler<CreateFeedDocumentResponse> handler = new JsonBodyHandler<>(CreateFeedDocumentResponse.class);
 
         return getRequestWrapped(request, handler);
+    }
+
+    @SneakyThrows
+    public CreateFeedDocumentResponse createFeed(CreateFeedSpecification createFeedSpecification) {
+
+        String requestBody = getString(createFeedSpecification);
+        final var signRequest = signRequest(ConstantCodes.FEEDS_API_V20160630, HttpMethodName.POST, null, requestBody);
+
+        HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.FEEDS_API_V20160630))
+                .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+                .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+                .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
+                .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
+                .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
+                .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
+                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                .build();
+
+        HttpResponse.BodyHandler<CreateFeedDocumentResponse> handler = new JsonBodyHandler<>(CreateFeedDocumentResponse.class);
+
+        return getRequestWrapped(request, handler);
+    }
+
+    @SneakyThrows
+    public void uploadFeedDocument(String feedUrl, InputStream inputStream) {
+
+        HttpRequest.newBuilder()
+                .uri(URI.create(feedUrl))
+                .POST(HttpRequest.BodyPublishers.ofByteArray(inputStream.readAllBytes()))
+                .build();
     }
 }

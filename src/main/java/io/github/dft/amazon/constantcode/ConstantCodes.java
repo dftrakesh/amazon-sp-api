@@ -18,6 +18,7 @@ public interface ConstantCodes {
 
     String SELLERS_API_V1 = "/sellers/v1/marketplaceParticipations";
     String FEEDS_API_V20160630 = "/feeds/2021-06-30/feeds";
+    String FEEDS_API_V20160630_CREATE_FEED_DOCUMENT = "/feeds/2021-06-30/documents";
     String REPORTS_API_V202106 = "/reports/2021-06-30/reports";
     String REPORT_DOCUMENTS_API_V202106 = "/reports/2021-06-30/documents";
     String REPORT_SCHEDULES_API_V202106 = "/reports/2021-06-30/schedules";
