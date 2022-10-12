@@ -1,11 +1,16 @@
 package io.github.dft.amazon;
 
 import com.amazonaws.http.HttpMethodName;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.dft.amazon.constantcode.ConstantCodes;
 import io.github.dft.amazon.model.AccessCredentials;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
 import io.github.dft.amazon.model.productfees.GetMyFeesEstimateResponse;
+import io.github.dft.amazon.model.productfees.GetMyFeesEstimateResults;
 import io.github.dft.amazon.model.productfees.GetMyFeesEstimatesRequest;
+import io.github.dft.amazon.model.productfees.GetMyFeesEstimatesRequestBody;
+import io.github.dft.amazon.model.productfees.GetMyFeesEstimatesResponse;
+import io.github.dft.amazon.model.reports.v202106.ErrorList;
 import lombok.SneakyThrows;
 
 import java.net.URI;
@@ -14,8 +19,11 @@ import java.net.http.HttpResponse;
 
 public class AmazonSPProductFees extends AmazonSellingPartnerSdk {
 
+    private final ObjectMapper objectMapper;
+
     public AmazonSPProductFees(AccessCredentials accessCredentials) {
         super(accessCredentials);
+        objectMapper = new ObjectMapper();
     }
 
     @SneakyThrows
@@ -40,7 +48,7 @@ public class AmazonSPProductFees extends AmazonSellingPartnerSdk {
     }
 
     @SneakyThrows
-    public GetMyFeesEstimateResponse getMyFeesEstimates(GetMyFeesEstimatesRequest body) {
+    public GetMyFeesEstimatesResponse getMyFeesEstimates(GetMyFeesEstimatesRequestBody body) {
 
         String requestBody = getString(body);
         final var signRequest = signRequest(ConstantCodes.PRODUCTFEES_API_MY_FEESESTIMATE_V0, HttpMethodName.POST, null, requestBody);
@@ -55,8 +63,17 @@ public class AmazonSPProductFees extends AmazonSellingPartnerSdk {
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
 
-        HttpResponse.BodyHandler<GetMyFeesEstimateResponse> handler = new JsonBodyHandler<>(GetMyFeesEstimateResponse.class);
-        return getRequestWrapped(request, handler);
+        HttpResponse.BodyHandler<Object> handler = new JsonBodyHandler<>(Object.class);
+
+        final var response = getRequestWrapped(request, handler);
+        if (!response.getClass().getSimpleName().equalsIgnoreCase("ArrayList")) {
+            final var getMyFeesEstimateResults = new GetMyFeesEstimateResults();
+            final var getMyFeesEstimatesResponse = new GetMyFeesEstimatesResponse();
+            getMyFeesEstimateResults.setErrors(objectMapper.convertValue(response, ErrorList.class));
+            getMyFeesEstimatesResponse.add(getMyFeesEstimateResults);
+            return getMyFeesEstimatesResponse;
+        }
+        return objectMapper.convertValue(response, GetMyFeesEstimatesResponse.class);
     }
 
 
