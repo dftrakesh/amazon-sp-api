@@ -25,6 +25,9 @@ public class Item {
     @JsonProperty("productTypes")
     private List<ItemProductTypeByMarketplace> productTypes;
 
+    @JsonProperty("relationships")
+    private List<ItemRelationships> relationships;
+
     @JsonProperty("summaries")
     private List<ItemSummaryByMarketplace> summaries;
 
