@@ -9,6 +9,6 @@ public class ItemImage {
 
     private String variant;
     private String link;
-    private Integer height;
-    private Integer width;
+    private Double height;
+    private Double width;
 }
