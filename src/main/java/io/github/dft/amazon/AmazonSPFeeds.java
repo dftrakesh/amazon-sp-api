@@ -18,6 +18,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
@@ -182,6 +183,18 @@ public class AmazonSPFeeds extends AmazonSellingPartnerSdk {
 
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .get()
+                .body();
+    }
+
+    @SneakyThrows
+    public String uploadFeedDocument(String feedUrl, String file, String contentType) {
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(feedUrl))
+                .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, contentType)
+                .PUT(HttpRequest.BodyPublishers.ofByteArray(file.getBytes(StandardCharsets.UTF_8)))
+                .build();
+
+        return client.send(request, HttpResponse.BodyHandlers.ofString())
                 .body();
     }
 }
