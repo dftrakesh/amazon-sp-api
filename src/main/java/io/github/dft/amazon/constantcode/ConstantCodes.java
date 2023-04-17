@@ -35,8 +35,10 @@ public interface ConstantCodes {
     String  PRODUCTFEES_API_MY_FEESESTIMATE_V0 = "/products/fees/v0/feesEstimate";
     String LWA_AUTHORIZATION_SERVER = "https://api.amazon.com/auth/o2/token";
     String CATALOG_ITEMS_API_V202204 = "/catalog/2022-04-01/items/";
+    String CATALOG_CATEGORIES_API_V0 = "/catalog/v0/categories";
     String FULFILLMENT_OUTBOUND_API_V202007 = "/fba/outbound/2020-07-01/fulfillmentOrders";
     String FBA_INVENTORY_API_V1 = "/fba/inventory/v1/summaries";
+    String PRODUCTS_PRICING_COMPETITIVE_PRICE_API_V0 = "/products/pricing/v0/competitivePrice";
 
     String AWS_REGION_US_EAST_1 = "us-east-1";
     String AWS_REGION_US_WEST_1 = "us-west-2";
