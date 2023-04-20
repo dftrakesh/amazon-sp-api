@@ -28,6 +28,9 @@ public class Item {
     @JsonProperty("relationships")
     private List<ItemRelationships> relationships;
 
+    @JsonProperty("salesRanks")
+    private List<ItemSalesRanksByMarketplace> salesRanks;
+
     @JsonProperty("summaries")
     private List<ItemSummaryByMarketplace> summaries;
 
