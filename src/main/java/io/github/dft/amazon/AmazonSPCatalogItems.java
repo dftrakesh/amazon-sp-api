@@ -75,7 +75,7 @@ public class AmazonSPCatalogItems extends AmazonSellingPartnerSdk {
     }
 
     @SneakyThrows
-    public CatalogCategoriesResponse getProductGetProductCategoriesForSKU(HashMap<String, String> params) {
+    public CatalogCategoriesResponse listCatalogCategories(HashMap<String, String> params) {
         final var signRequest = signRequest(ConstantCodes.CATALOG_CATEGORIES_API_V0, HttpMethodName.GET, params, null);
 
         URIBuilder uriBuilder = new URIBuilder(sellingRegionEndpoint + ConstantCodes.CATALOG_CATEGORIES_API_V0);
