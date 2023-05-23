@@ -6,7 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 @Data
-public class AccessCredentials {
+public class AmazonCredentials {
     private String user;
     private String accessKeyId;
     private String secretAccessKey;
