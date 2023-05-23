@@ -2,7 +2,7 @@ package io.github.dft.amazon;
 
 import com.amazonaws.http.HttpMethodName;
 import io.github.dft.amazon.constantcode.ConstantCodes;
-import io.github.dft.amazon.model.AccessCredentials;
+import io.github.dft.amazon.model.AmazonCredentials;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
 import io.github.dft.amazon.model.tokens.v202103.CreateRestrictedDataTokenRequest;
 import io.github.dft.amazon.model.tokens.v202103.CreateRestrictedDataTokenResponse;
@@ -14,8 +14,8 @@ import java.net.http.HttpResponse;
 
 public class AmazonSPTokens extends AmazonSellingPartnerSdk {
 
-    public AmazonSPTokens(AccessCredentials accessCredentials) {
-        super(accessCredentials);
+    public AmazonSPTokens(AmazonCredentials amazonCredentials) {
+        super(amazonCredentials);
     }
 
     @SneakyThrows
@@ -27,7 +27,7 @@ public class AmazonSPTokens extends AmazonSellingPartnerSdk {
         HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.TOKENS_API_V202103))
             .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
             .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
-            .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, accessCredentials.getAccessToken())
+            .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, amazonCredentials.getAccessToken())
             .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
             .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
             .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
