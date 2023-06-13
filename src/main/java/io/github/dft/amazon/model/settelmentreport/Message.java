@@ -1,17 +1,16 @@
 package io.github.dft.amazon.model.settelmentreport;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.Data;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 
 @Data
-@XmlAccessorType(XmlAccessType.FIELD)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Message {
 
-    @XmlElement(name = "MessageID")
+    @JacksonXmlProperty(localName = "MessageID")
     private Integer messageId;
 
-    @XmlElement(name = "SettlementReport")
+    @JacksonXmlProperty(localName = "SettlementReport")
     private SettlementReport settlementReport;
 }

@@ -1,26 +1,25 @@
 package io.github.dft.amazon.model.settelmentreport;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.Data;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 
 @Data
-@XmlAccessorType(XmlAccessType.FIELD)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class AdjustedItem {
 
-    @XmlElement(name = "AmazonOrderItemCode")
+    @JacksonXmlProperty(localName = "AmazonOrderItemCode")
     private String amazonOrderItemCode;
 
-    @XmlElement(name = "MerchantAdjustmentItemID")
+    @JacksonXmlProperty(localName = "MerchantAdjustmentItemID")
     private String merchantAdjustmentItemId;
 
-    @XmlElement(name = "SKU")
+    @JacksonXmlProperty(localName = "SKU")
     private String sku;
 
-    @XmlElement(name = "ItemPriceAdjustments")
+    @JacksonXmlProperty(localName = "ItemPriceAdjustments")
     private ItemPriceAdjustments itemPriceAdjustments;
 
-    @XmlElement(name = "ItemFeeAdjustments")
+    @JacksonXmlProperty(localName = "ItemFeeAdjustments")
     private ItemFeeAdjustments itemFeeAdjustments;
 }

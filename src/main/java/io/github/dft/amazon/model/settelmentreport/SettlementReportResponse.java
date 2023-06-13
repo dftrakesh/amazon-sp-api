@@ -1,22 +1,21 @@
 package io.github.dft.amazon.model.settelmentreport;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Data;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 @Data
-@XmlRootElement(name = "AmazonEnvelope")
-@XmlAccessorType(XmlAccessType.FIELD)
+@JacksonXmlRootElement(localName = "AmazonEnvelope")
 public class SettlementReportResponse {
 
-    @XmlElement(name = "Header")
+    private String noNamespaceSchemaLocation;
+
+    @JacksonXmlProperty(localName = "Message")
+    private Message message;
+
+    @JacksonXmlProperty(localName = "Header")
     private Header header;
 
-    @XmlElement(name = "MessageType")
+    @JacksonXmlProperty(localName = "MessageType")
     private String messageType;
-
-    @XmlElement(name = "Message")
-    private Message message;
 }

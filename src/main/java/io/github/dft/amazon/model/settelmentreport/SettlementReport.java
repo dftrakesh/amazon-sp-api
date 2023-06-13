@@ -1,27 +1,36 @@
 package io.github.dft.amazon.model.settelmentreport;
 
+import com.fasterxml.jackson.annotation.JsonMerge;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Data;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import java.util.List;
 
 @Data
-@XmlAccessorType(XmlAccessType.FIELD)
+@JacksonXmlRootElement(localName = "SettlementReport")
 public class SettlementReport {
 
-    @XmlElement(name = "SettlementData")
+    @JacksonXmlProperty(localName = "SettlementData")
     private SettlementData settlementData;
 
-    @XmlElement(name = "Order")
+    @JsonMerge
+    @JacksonXmlProperty(localName = "Order")
+    @JacksonXmlElementWrapper(useWrapping = false)
     private List<Order> order;
 
-    @XmlElement(name = "Refund")
+    @JsonMerge
+    @JacksonXmlProperty(localName = "Refund")
+    @JacksonXmlElementWrapper(useWrapping = false)
     private List<Refund> refund;
 
-    @XmlElement(name = "OtherTransaction")
+    @JsonMerge
+    @JacksonXmlElementWrapper(useWrapping = false)
+    @JacksonXmlProperty(localName = "OtherTransaction")
     private List<OtherTransaction> otherTransaction;
 
-    @XmlElement(name = "AdvertisingTransactionDetails")
+    @JsonMerge
+    @JacksonXmlElementWrapper(useWrapping = false)
+    @JacksonXmlProperty(localName = "AdvertisingTransactionDetails")
     private List<AdvertisingTransactionDetails> advertisingTransactionDetails;
 }

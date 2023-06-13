@@ -1,17 +1,16 @@
 package io.github.dft.amazon.model.settelmentreport;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import lombok.Data;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 
 @Data
-@XmlAccessorType(XmlAccessType.FIELD)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Header {
 
-    @XmlElement(name = "DocumentVersion")
+    @JacksonXmlProperty(localName = "DocumentVersion")
     private String documentVersion;
 
-    @XmlElement(name = "MerchantIdentifier")
+    @JacksonXmlProperty(localName = "MerchantIdentifier")
     private String merchantIdentifier;
 }

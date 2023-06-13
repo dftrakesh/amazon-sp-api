@@ -1,26 +1,31 @@
 package io.github.dft.amazon.model.settelmentreport;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import io.github.dft.amazon.common.DateDeserializer;
 import lombok.Data;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
+import java.time.LocalDateTime;
 
 @Data
-@XmlAccessorType(XmlAccessType.FIELD)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SettlementData {
 
-    @XmlElement(name = "AmazonSettlementID")
+    @JacksonXmlProperty(localName = "AmazonSettlementID")
     private Long AmazonSettlementID;
 
-    @XmlElement(name = "TotalAmount")
+    @JacksonXmlProperty(localName = "TotalAmount")
     private Double totalAmount;
 
-    @XmlElement(name = "StartDate")
-    private String StartDate;
+    @JacksonXmlProperty(localName = "StartDate")
+    @JsonDeserialize(using = DateDeserializer.class)
+    private LocalDateTime StartDate;
 
-    @XmlElement(name = "EndDate")
-    private String EndDate;
+    @JacksonXmlProperty(localName = "EndDate")
+    @JsonDeserialize(using = DateDeserializer.class)
+    private LocalDateTime EndDate;
 
-    @XmlElement(name = "DepositDate")
-    private String DepositDate;
+    @JacksonXmlProperty(localName = "DepositDate")
+    @JsonDeserialize(using = DateDeserializer.class)
+    private LocalDateTime DepositDate;
 }

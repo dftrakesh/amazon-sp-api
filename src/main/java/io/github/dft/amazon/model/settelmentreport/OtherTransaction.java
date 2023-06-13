@@ -1,23 +1,26 @@
 package io.github.dft.amazon.model.settelmentreport;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import io.github.dft.amazon.common.DateDeserializer;
 import lombok.Data;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
+import java.time.LocalDateTime;
 
 @Data
-@XmlAccessorType(XmlAccessType.FIELD)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class OtherTransaction {
 
-    @XmlElement(name = "TransactionType")
+    @JacksonXmlProperty(localName = "TransactionType")
     private String transactionType;
 
-    @XmlElement(name = "TransactionID")
+    @JacksonXmlProperty(localName = "TransactionID")
     private String transactionId;
 
-    @XmlElement(name = "PostedDate")
-    private String postedDate;
+    @JacksonXmlProperty(localName = "PostedDate")
+    @JsonDeserialize(using = DateDeserializer.class)
+    private LocalDateTime postedDate;
 
-    @XmlElement(name = "Amount")
+    @JacksonXmlProperty(localName = "Amount")
     private Double amount;
 }

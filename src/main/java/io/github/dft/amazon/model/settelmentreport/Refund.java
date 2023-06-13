@@ -1,26 +1,25 @@
 package io.github.dft.amazon.model.settelmentreport;
 
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Data;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 
 @Data
-@XmlAccessorType(XmlAccessType.FIELD)
+@JacksonXmlRootElement(localName = "Refund")
 public class Refund {
 
-    @XmlElement(name = "AmazonOrderID")
+    @JacksonXmlProperty(localName = "AmazonOrderID")
     private String amazonOrderId;
 
-    @XmlElement(name = "AdjustmentID")
+    @JacksonXmlProperty(localName = "AdjustmentID")
     private String adjustmentId;
 
-    @XmlElement(name = "MarketplaceName")
+    @JacksonXmlProperty(localName = "MarketplaceName")
     private String marketplaceName;
 
-    @XmlElement(name = "MerchantOrderID")
+    @JacksonXmlProperty(localName = "MerchantOrderID")
     private String merchantOrderId;
 
-    @XmlElement(name = "Fulfillment")
+    @JacksonXmlProperty(localName = "Fulfillment")
     private Fulfillment fulfillment;
 }
