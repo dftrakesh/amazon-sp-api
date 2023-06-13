@@ -9,7 +9,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Data
 @XmlRootElement(name = "AmazonEnvelope")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class AmazonEnvelope {
+public class SettlementReportResponse {
 
     @XmlElement(name = "Header")
     private Header header;
