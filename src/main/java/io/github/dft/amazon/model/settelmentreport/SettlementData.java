@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 public class SettlementData {
 
     @JacksonXmlProperty(localName = "AmazonSettlementID")
-    private Long AmazonSettlementID;
+    private Long AmazonSettlementId;
 
     @JacksonXmlProperty(localName = "TotalAmount")
     private Double totalAmount;

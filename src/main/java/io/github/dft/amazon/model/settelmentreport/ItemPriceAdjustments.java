@@ -10,5 +10,5 @@ public class ItemPriceAdjustments {
 
     @JacksonXmlProperty(localName = "Component")
     @JacksonXmlElementWrapper(useWrapping = false)
-    private List<Component> component;
+    private List<Component> componentList;
 }

@@ -17,20 +17,20 @@ public class SettlementReport {
     @JsonMerge
     @JacksonXmlProperty(localName = "Order")
     @JacksonXmlElementWrapper(useWrapping = false)
-    private List<Order> order;
+    private List<Order> orderList;
 
     @JsonMerge
     @JacksonXmlProperty(localName = "Refund")
     @JacksonXmlElementWrapper(useWrapping = false)
-    private List<Refund> refund;
+    private List<Refund> refundList;
 
     @JsonMerge
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "OtherTransaction")
-    private List<OtherTransaction> otherTransaction;
+    private List<OtherTransaction> otherTransactionList;
 
     @JsonMerge
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "AdvertisingTransactionDetails")
-    private List<AdvertisingTransactionDetails> advertisingTransactionDetails;
+    private List<AdvertisingTransactionDetails> advertisingTransactionDetailsList;
 }
