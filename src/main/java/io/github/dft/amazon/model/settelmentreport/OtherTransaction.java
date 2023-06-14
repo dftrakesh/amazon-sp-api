@@ -29,5 +29,5 @@ public class OtherTransaction {
     private LocalDateTime postedDate;
 
     @JacksonXmlProperty(localName = "Amount")
-    private Double amount;
+    private Amount amount;
 }

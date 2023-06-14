@@ -10,5 +10,5 @@ public class Fee {
     private String type;
 
     @JacksonXmlProperty(localName = "Amount")
-    private Double amount;
+    private Amount amount;
 }

@@ -13,5 +13,5 @@ public class Promotion {
     private String type;
 
     @JacksonXmlProperty(localName = "Amount")
-    private Double amount;
+    private Amount amount;
 }
