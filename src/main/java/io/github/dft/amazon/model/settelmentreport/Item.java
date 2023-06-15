@@ -7,7 +7,7 @@ import lombok.Data;
 public class Item {
 
     @JacksonXmlProperty(localName = "AmazonOrderItemCode")
-    private String amazonOrderItemCode;
+    private Long amazonOrderItemCode;
 
     @JacksonXmlProperty(localName = "SKU")
     private String sku;
@@ -16,7 +16,7 @@ public class Item {
     private Promotion promotion;
 
     @JacksonXmlProperty(localName = "Quantity")
-    private String quantity;
+    private Integer quantity;
 
     @JacksonXmlProperty(localName = "ItemPrice")
     private ItemPrice itemPrice;
