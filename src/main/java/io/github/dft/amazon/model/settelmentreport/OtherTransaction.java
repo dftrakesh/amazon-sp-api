@@ -12,6 +12,15 @@ public class OtherTransaction {
     @JacksonXmlProperty(localName = "TransactionType")
     private String transactionType;
 
+    @JacksonXmlProperty(localName = "AmazonOrderID")
+    private String amazonOrderId;
+
+    @JacksonXmlProperty(localName = "MerchantFulfillmentID")
+    private String merchantFulfillmentId;
+
+    @JacksonXmlProperty(localName = "MarketplaceName")
+    private String marketplaceName;
+
     @JacksonXmlProperty(localName = "TransactionID")
     private String transactionId;
 
@@ -20,5 +29,5 @@ public class OtherTransaction {
     private LocalDateTime postedDate;
 
     @JacksonXmlProperty(localName = "Amount")
-    private Double amount;
+    private Amount amount;
 }

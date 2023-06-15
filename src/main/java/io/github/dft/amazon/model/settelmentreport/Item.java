@@ -12,6 +12,9 @@ public class Item {
     @JacksonXmlProperty(localName = "SKU")
     private String sku;
 
+    @JacksonXmlProperty(localName = "Promotion")
+    private Promotion promotion;
+
     @JacksonXmlProperty(localName = "Quantity")
     private String quantity;
 

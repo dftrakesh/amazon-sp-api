@@ -13,7 +13,7 @@ public class SettlementData {
     private Long AmazonSettlementId;
 
     @JacksonXmlProperty(localName = "TotalAmount")
-    private Double totalAmount;
+    private Amount totalAmount;
 
     @JacksonXmlProperty(localName = "StartDate")
     @JsonDeserialize(using = DateDeserializer.class)

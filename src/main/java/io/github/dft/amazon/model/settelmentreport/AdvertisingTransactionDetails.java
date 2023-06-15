@@ -20,11 +20,11 @@ public class AdvertisingTransactionDetails {
     private String invoiceId;
 
     @JacksonXmlProperty(localName = "BaseAmount")
-    private Double baseAmount;
+    private Amount baseAmount;
 
     @JacksonXmlProperty(localName = "TaxAmount")
-    private Double taxAmount;
+    private Amount taxAmount;
 
     @JacksonXmlProperty(localName = "TransactionAmount")
-    private Double transactionAmount;
+    private Amount transactionAmount;
 }
