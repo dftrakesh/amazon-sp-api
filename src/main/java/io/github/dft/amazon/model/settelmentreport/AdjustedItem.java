@@ -7,10 +7,10 @@ import lombok.Data;
 public class AdjustedItem {
 
     @JacksonXmlProperty(localName = "AmazonOrderItemCode")
-    private String amazonOrderItemCode;
+    private Long amazonOrderItemCode;
 
     @JacksonXmlProperty(localName = "MerchantAdjustmentItemID")
-    private String merchantAdjustmentItemId;
+    private Long merchantAdjustmentItemId;
 
     @JacksonXmlProperty(localName = "SKU")
     private String sku;
