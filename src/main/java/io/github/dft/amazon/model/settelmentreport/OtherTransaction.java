@@ -5,6 +5,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import io.github.dft.amazon.common.DateDeserializer;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class OtherTransaction {
@@ -30,4 +31,7 @@ public class OtherTransaction {
 
     @JacksonXmlProperty(localName = "Amount")
     private Amount amount;
+
+    @JacksonXmlProperty(localName = "Fees")
+    private List<Fee> feeList;
 }

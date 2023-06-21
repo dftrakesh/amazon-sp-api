@@ -5,6 +5,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import lombok.Data;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -17,20 +18,20 @@ public class SettlementReport {
     @JsonMerge
     @JacksonXmlProperty(localName = "Order")
     @JacksonXmlElementWrapper(useWrapping = false)
-    private List<Order> orderList;
+    private List<Order> orderList = new ArrayList<>();
 
     @JsonMerge
     @JacksonXmlProperty(localName = "Refund")
     @JacksonXmlElementWrapper(useWrapping = false)
-    private List<Refund> refundList;
+    private List<Refund> refundList = new ArrayList<>();
 
     @JsonMerge
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "OtherTransaction")
-    private List<OtherTransaction> otherTransactionList;
+    private List<OtherTransaction> otherTransactionList = new ArrayList<>();
 
     @JsonMerge
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "AdvertisingTransactionDetails")
-    private List<AdvertisingTransactionDetails> advertisingTransactionDetailsList;
+    private List<AdvertisingTransactionDetails> advertisingTransactionDetailsList = new ArrayList<>();
 }
