@@ -62,6 +62,11 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
         return getRequestWrapped(request, handler);
     }
 
+    @SneakyThrows
+    public GetOrdersResponse getOrders(HashMap<String, String> params) {
+        return getOrders(params, false);
+    }
+
     public CreateRestrictedDataTokenRequest createRestrictedDataToken(String restrictedTokenPath) {
         CreateRestrictedDataTokenRequest createRestrictedDataTokenRequest = new CreateRestrictedDataTokenRequest();
         List<RestrictedResource> restrictedResources = new ArrayList<>();
@@ -78,7 +83,7 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
     }
 
     private String getPIIAccessToken(CreateRestrictedDataTokenRequest createRestrictedDataTokenRequest) {
-        if(restrictedAccessToken == null || ZonedDateTime.now(ZoneOffset.UTC).isAfter(this.restrictedAccessTokenExpireIn)) {
+        if (restrictedAccessToken == null || ZonedDateTime.now(ZoneOffset.UTC).isAfter(this.restrictedAccessTokenExpireIn)) {
             CreateRestrictedDataTokenResponse createRestrictedDataTokenResponse = amazonSPTokens.createRestrictedDataToken(createRestrictedDataTokenRequest);
             this.restrictedAccessToken = createRestrictedDataTokenResponse.getRestrictedDataToken();
             this.restrictedAccessTokenExpireIn = ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(createRestrictedDataTokenResponse.getExpiresIn());
