@@ -94,14 +94,19 @@ public class AmazonSPOrders extends AmazonSellingPartnerSdk {
 
     @SneakyThrows
     public GetOrderResponse getOrder(String orderId) {
-        orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
+        return getOrder(orderId, false);
+    }
 
+    @SneakyThrows
+    public GetOrderResponse getOrder(String orderId, boolean isPII) {
+        orderId = StringUtils.isEmpty(orderId) ? "" : orderId;
+        String token = isPII ? getPIIAccessToken(createRestrictedDataToken(AMAZON_ORDERS_PII_PATH + "/" + orderId)) : amazonCredentials.getAccessToken();
         final var signRequest = signRequest(ConstantCodes.ORDER_API_V0.replace("{orderId}", orderId), HttpMethodName.GET, null, null);
 
         HttpRequest request = HttpRequest.newBuilder(new URI(sellingRegionEndpoint + ConstantCodes.ORDERS_API_V0 + "/" + orderId))
                 .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
                 .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
-                .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, amazonCredentials.getAccessToken())
+                .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, token)
                 .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
                 .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
                 .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
