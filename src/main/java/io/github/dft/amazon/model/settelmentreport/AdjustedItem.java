@@ -20,4 +20,7 @@ public class AdjustedItem {
 
     @JacksonXmlProperty(localName = "ItemFeeAdjustments")
     private ItemFeeAdjustments itemFeeAdjustments;
+
+    @JacksonXmlProperty(localName = "PromotionAdjustment")
+    private PromotionAdjustment promotionAdjustment;
 }
