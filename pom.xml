@@ -6,7 +6,7 @@
 
     <groupId>io.github.dftrakesh</groupId>
     <artifactId>amazon-sp-api</artifactId>
-    <version>1.26</version>
+    <version>1.27</version>
     <packaging>jar</packaging>
 
 	<name>amazon-sp-api</name>

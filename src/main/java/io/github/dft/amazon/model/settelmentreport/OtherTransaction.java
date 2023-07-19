@@ -34,4 +34,7 @@ public class OtherTransaction {
 
     @JacksonXmlProperty(localName = "Fees")
     private List<Fee> feeList;
+
+    @JacksonXmlProperty(localName = "ShipmentID")
+    private Long shipmentId;
 }
