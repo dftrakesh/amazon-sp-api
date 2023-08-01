@@ -37,4 +37,16 @@ public class OtherTransaction {
 
     @JacksonXmlProperty(localName = "ShipmentID")
     private Long shipmentId;
+
+    @JacksonXmlProperty(localName = "OtherTransactionItem")
+    private OtherTransactionItem otherTransactionItem;
+
+    @JacksonXmlProperty(localName = "Charge")
+    private Charge charge;
+
+    @JacksonXmlProperty(localName = "AdjustmentID")
+    private String adjustmentID;
+
+    @JacksonXmlProperty(localName = "Item")
+    private Item item;
 }

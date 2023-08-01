@@ -33,4 +33,22 @@ public class SettlementReport {
     @JacksonXmlElementWrapper(useWrapping = false)
     @JacksonXmlProperty(localName = "AdvertisingTransactionDetails")
     private List<AdvertisingTransactionDetails> advertisingTransactionDetailsList;
+
+    @JacksonXmlProperty(localName = "Retrocharge")
+    private RetroCharge retroCharge;
+
+    @JacksonXmlProperty(localName = "SellerCouponPayment")
+    private SellerCouponPayment sellerCouponPayment;
+
+    @JacksonXmlProperty(localName = "GuaranteeClaim")
+    private GuaranteeClaim guaranteeClaim;
+
+    @JacksonXmlProperty(localName = "RetrochargeReversal")
+    private RetroChargeReversal retroChargeReversal;
+
+    @JacksonXmlProperty(localName = "Chargeback")
+    private ChargeBack chargeBack;
+
+    @JacksonXmlProperty(localName = "Liquidations")
+    private Liquidations liquidations;
 }
