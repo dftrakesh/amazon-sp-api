@@ -51,4 +51,7 @@ public class SettlementReport {
 
     @JacksonXmlProperty(localName = "Liquidations")
     private Liquidations liquidations;
+
+    @JacksonXmlProperty(localName = "TaxWithholding")
+    private TaxWithholding taxWithholding;
 }
