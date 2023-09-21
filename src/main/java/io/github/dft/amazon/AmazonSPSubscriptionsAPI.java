@@ -51,7 +51,6 @@ public class AmazonSPSubscriptionsAPI extends AmazonSellingPartnerSdk {
         return getRequestWrapped(request, handler);
     }
 
-
     public SubscriptionWrapper getAllSubscriptionByNotificationType(String notificationType) {
         URI uri = URI.create(sellingRegionEndpoint + NOTIFICATION_SUBSCRIPTION_API_V1 + FORWARD_SLASH + notificationType);
 
