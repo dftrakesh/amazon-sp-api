@@ -52,7 +52,7 @@ public class AmazonSPSubscriptionsAPI extends AmazonSellingPartnerSdk {
     }
 
 
-    public SubscriptionWrapper getAllSubscription(String notificationType) {
+    public SubscriptionWrapper getAllSubscriptionByNotificationType(String notificationType) {
         URI uri = URI.create(sellingRegionEndpoint + NOTIFICATION_SUBSCRIPTION_API_V1 + FORWARD_SLASH + notificationType);
 
         final var signRequest = signRequest(
