@@ -3,8 +3,8 @@ package io.github.dft.amazon;
 import com.amazonaws.http.HttpMethodName;
 import io.github.dft.amazon.model.AmazonCredentials;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
-import io.github.dft.amazon.model.subscription.SubscriptionRequest;
-import io.github.dft.amazon.model.subscription.SubscriptionWrapper;
+import io.github.dft.amazon.model.subscription.v1.SubscriptionRequest;
+import io.github.dft.amazon.model.subscription.v1.SubscriptionWrapper;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
