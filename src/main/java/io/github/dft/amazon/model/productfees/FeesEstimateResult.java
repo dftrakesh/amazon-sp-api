@@ -13,4 +13,10 @@ public class FeesEstimateResult {
 
     @JsonProperty("FeesEstimate")
     private FeesEstimate feesEstimate;
+
+    @JsonProperty("FeesEstimateIdentifier")
+    private FeesEstimateIdentifier feesEstimateIdentifier;
+
+    @JsonProperty("Error")
+    private io.github.dft.amazon.model.error.Error error;
 }
