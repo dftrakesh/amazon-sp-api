@@ -160,7 +160,7 @@ public class AmazonSellingPartnerSdk {
                 builder.append("&");
             builder.append(keyValueParam);
         }
-        return URI.create(uri.getScheme() + "://" + uri.getAuthority() + "" + uri.getPath() + "?" + builder);
+        return URI.create(uri.getScheme() + "://" + uri.getAuthority() + uri.getPath() + "?" + builder);
     }
 
     @SneakyThrows
