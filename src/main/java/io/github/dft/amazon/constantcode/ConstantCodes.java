@@ -40,6 +40,7 @@ public interface ConstantCodes {
     String FBA_INVENTORY_API_V1 = "/fba/inventory/v1/summaries";
     String PRODUCTS_PRICING_COMPETITIVE_PRICE_API_V0 = "/products/pricing/v0/competitivePrice";
     String NOTIFICATION_SUBSCRIPTION_API_V1 = "/notifications/v1/subscriptions";
+    String LISTING_ITEMS_V20210801 = "/listings/2021-08-01/items";
     String FORWARD_SLASH = "/";
 
     String AWS_REGION_US_EAST_1 = "us-east-1";

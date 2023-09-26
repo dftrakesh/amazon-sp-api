@@ -147,6 +147,21 @@ public class AmazonSellingPartnerSdk {
         }
     }
 
+    protected URI addParameters(URI uri, HashMap<String, String> params) {
+        String query = uri.getQuery();
+        StringBuilder builder = new StringBuilder();
+
+        if (query != null)
+            builder.append(query);
+
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            String keyValueParam = entry.getKey() + "=" + entry.getValue();
+            if (!builder.toString().isEmpty())
+                builder.append("&");
+            builder.append(keyValueParam);
+        }
+        return URI.create(uri.getScheme() + "://" + uri.getAuthority() + "" + uri.getPath() + "?" + builder);
+    }
 
     @SneakyThrows
     public <T> T getRequestWrapped(HttpRequest request, HttpResponse.BodyHandler<T> handler) {
