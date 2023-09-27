@@ -1,6 +1,6 @@
 package io.github.dft.amazon.model.subscription.v1;
 
-import io.github.dft.amazon.model.error.Error;
+import io.github.dft.amazon.model.error.v1.Error;
 import lombok.Data;
 
 import java.util.List;
