@@ -13,13 +13,14 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy.class)
 public class NotificationPayload {
 
-    private String SellerId;
-    private String Asin;
-    private String MarketplaceId;
-    private String FulfillmentChannelCode;
-    private String Sku;
-    private Integer Quantity;
-    private List<String> Status;
+    private String sellerId;
+    private String asin;
+    private String marketplaceId;
+    private String fulfillmentChannelCode;
+    private String sku;
+    private Integer quantity;
+    private List<String> status;
+
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-    private LocalDateTime CreatedDate;
+    private LocalDateTime createdDate;
 }
