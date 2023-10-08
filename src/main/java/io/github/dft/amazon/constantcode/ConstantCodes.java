@@ -52,4 +52,9 @@ public interface ConstantCodes {
 
     int MAX_ATTEMPTS = 50;
     int TIME_OUT_DURATION = 15000;
+
+    String USA_MARKETPLACE_ID = "ATVPDKIKX0DER";
+    String PARAMETER_NAME_ITEM_TYPE = "ItemType";
+    String PARAMETER_VALUE_ITEM_TYPE_SKU = "Sku";
+    String PARAMETER_VALUE_ITEM_TYPE_ASIN = "ASIN";
 }
