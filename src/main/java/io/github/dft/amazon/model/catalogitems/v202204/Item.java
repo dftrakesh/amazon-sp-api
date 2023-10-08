@@ -19,6 +19,9 @@ public class Item {
     @JsonProperty("dimensions")
     private List<ItemDimensionsByMarketplace> dimensions;
 
+    @JsonProperty("identifiers")
+    private List<ItemIdentifiers> identifiers;
+
     @JsonProperty("images")
     private List<ItemImagesByMarketplace> images;
 
@@ -30,9 +33,6 @@ public class Item {
 
     @JsonProperty("salesRanks")
     private List<ItemSalesRanksByMarketplace> salesRanks;
-
-    @JsonProperty("summaries")
-    private List<ItemSummaryByMarketplace> summaries;
 
     private List<Error> errors;
 }
