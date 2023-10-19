@@ -15,4 +15,5 @@ public class ItemValue {
     private Integer quantity;
     private String languageTag;
     private String fulfillmentChannelCode;
+    private String mediaLocation;
 }
