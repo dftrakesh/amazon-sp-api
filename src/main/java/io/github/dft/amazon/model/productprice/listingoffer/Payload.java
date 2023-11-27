@@ -9,11 +9,15 @@ import lombok.Data;
 import java.util.List;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 @JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy.class)
 public class Payload {
 
     @JsonProperty("SKU")
     private String sku;
+
+    @JsonProperty("ASIN")
+    private String asin;
 
     @JsonProperty("status")
     private String status;
