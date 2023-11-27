@@ -4,7 +4,7 @@ import com.amazonaws.http.HttpMethodName;
 import io.github.dft.amazon.model.AmazonCredentials;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
 import io.github.dft.amazon.model.productprice.GetCompetitivePriceResponse;
-import io.github.dft.amazon.model.productprice.listingoffer.GetOffersResponse;
+import io.github.dft.amazon.model.productprice.listinganditemoffer.GetOffersResponse;
 import lombok.SneakyThrows;
 import org.apache.http.client.utils.URIBuilder;
 

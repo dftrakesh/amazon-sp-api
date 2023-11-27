@@ -1,4 +1,4 @@
-package io.github.dft.amazon.model.productprice.listingoffer;
+package io.github.dft.amazon.model.productprice.listinganditemoffer;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

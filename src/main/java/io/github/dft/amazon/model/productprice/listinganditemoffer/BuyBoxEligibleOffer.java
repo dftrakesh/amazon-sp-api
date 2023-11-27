@@ -1,13 +1,16 @@
-package io.github.dft.amazon.model.productprice.listingoffer;
+package io.github.dft.amazon.model.productprice.listinganditemoffer;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
-public class NumberOfOffer {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class BuyBoxEligibleOffer {
+
     private String condition;
     private String fulfillmentChannel;
-
+    
     @JsonProperty("OfferCount")
     private Integer offerCount;
 }

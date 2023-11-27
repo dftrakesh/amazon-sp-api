@@ -1,4 +1,4 @@
-package io.github.dft.amazon.model.productprice.listingoffer;
+package io.github.dft.amazon.model.productprice.listinganditemoffer;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -7,15 +7,12 @@ import lombok.Data;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy.class)
-public class LowestPrice {
+public class BuyBoxPrice {
 
     @JsonProperty("condition")
     private String condition;
 
-    @JsonProperty("fulfillmentChannel")
-    private String fulfillmentChannel;
-
-    private Shipping shipping;
     private LandedPrice landedPrice;
     private ListingPrice listingPrice;
+    private Shipping shipping;
 }

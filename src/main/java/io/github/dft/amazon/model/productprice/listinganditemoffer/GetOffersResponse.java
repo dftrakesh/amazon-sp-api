@@ -1,4 +1,4 @@
-package io.github.dft.amazon.model.productprice.listingoffer;
+package io.github.dft.amazon.model.productprice.listinganditemoffer;
 
 import io.github.dft.amazon.model.error.v1.Error;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package io.github.dft.amazon.model.productprice.listingoffer;
+package io.github.dft.amazon.model.productprice.listinganditemoffer;
 
 import lombok.Data;
 
