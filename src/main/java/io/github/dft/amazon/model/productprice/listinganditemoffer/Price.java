@@ -6,8 +6,8 @@ import lombok.Data;
 
 @Data
 @JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy.class)
-public class Shipping {
-
+public class Price {
+    
     private Double amount;
     private String currencyCode;
 }

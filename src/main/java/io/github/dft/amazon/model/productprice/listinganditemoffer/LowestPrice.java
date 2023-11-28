@@ -15,7 +15,7 @@ public class LowestPrice {
     @JsonProperty("fulfillmentChannel")
     private String fulfillmentChannel;
 
-    private Shipping shipping;
-    private LandedPrice landedPrice;
-    private ListingPrice listingPrice;
+    private Price shipping;
+    private Price landedPrice;
+    private Price listingPrice;
 }

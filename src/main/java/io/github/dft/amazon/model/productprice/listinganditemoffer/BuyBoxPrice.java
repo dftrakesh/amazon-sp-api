@@ -12,7 +12,7 @@ public class BuyBoxPrice {
     @JsonProperty("condition")
     private String condition;
 
-    private LandedPrice landedPrice;
-    private ListingPrice listingPrice;
-    private Shipping shipping;
+    private Price landedPrice;
+    private Price listingPrice;
+    private Price shipping;
 }

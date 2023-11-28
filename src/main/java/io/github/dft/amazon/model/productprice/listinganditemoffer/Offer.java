@@ -8,8 +8,8 @@ import lombok.Data;
 @JsonNaming(PropertyNamingStrategies.UpperCamelCaseStrategy.class)
 public class Offer {
 
-    private Shipping shipping;
-    private ListingPrice listingPrice;
+    private Price shipping;
+    private Price listingPrice;
     private ShippingTime shippingTime;
     private SellerFeedbackRating sellerFeedbackRating;
     private ShipsFrom shipsFrom;
