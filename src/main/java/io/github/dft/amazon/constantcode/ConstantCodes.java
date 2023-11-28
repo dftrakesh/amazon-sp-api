@@ -40,6 +40,8 @@ public interface ConstantCodes {
     String FBA_INVENTORY_API_V1 = "/fba/inventory/v1/summaries";
     String OFFERS_ENDPOINT = "/offers";
     String PRODUCTS_PRICING_ITEMS_V0 = "/products/pricing/v0/items/";
+    String BATCH_PRODUCTS_PRICING_ITEMS_OFFERS_V0 = "/batches/products/pricing/v0/itemOffers";
+    String BATCH_PRODUCTS_PRICING_ITEMS_LISTINGS_V0 = "/batches/products/pricing/v0/listingOffers";
     String PRODUCTS_PRICING_LISTINGS_V0 = "/products/pricing/v0/listings/";
     String PRODUCTS_PRICING_COMPETITIVE_PRICE_API_V0 = "/products/pricing/v0/competitivePrice";
     String NOTIFICATION_SUBSCRIPTION_API_V1 = "/notifications/v1/subscriptions";
