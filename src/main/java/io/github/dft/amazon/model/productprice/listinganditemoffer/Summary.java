@@ -12,7 +12,7 @@ public class Summary {
 
     private List<LowestPrice> lowestPrices;
     private List<BuyBoxPrice> buyBoxPrices;
-    private List<NumberOfOffer> numberOfOffers;
-    private List<BuyBoxEligibleOffer> buyBoxEligibleOffers;
+    private List<OfferCountDetails> numberOfOffers;
+    private List<OfferCountDetails> buyBoxEligibleOffers;
     private Integer totalOfferCount;
 }
