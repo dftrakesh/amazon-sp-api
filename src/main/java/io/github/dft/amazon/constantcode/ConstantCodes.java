@@ -44,6 +44,7 @@ public interface ConstantCodes {
     String BATCH_PRODUCTS_PRICING_ITEMS_LISTINGS_V0 = "/batches/products/pricing/v0/listingOffers";
     String PRODUCTS_PRICING_LISTINGS_V0 = "/products/pricing/v0/listings/";
     String PRODUCTS_PRICING_COMPETITIVE_PRICE_API_V0 = "/products/pricing/v0/competitivePrice";
+    String PRODUCTS_PRICING_GET_LISTING_OFFERS = "/products/pricing/v0/listings/%s/offers";
     String NOTIFICATION_SUBSCRIPTION_API_V1 = "/notifications/v1/subscriptions";
     String LISTING_ITEMS_V20210801 = "/listings/2021-08-01/items";
     String FORWARD_SLASH = "/";

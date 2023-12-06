@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class BatchOfferResponseWrappers {
-    private List<BatchOfferResponseWrapper> responses;
+public class GetListingOffersBatchResponse {
+    private List<ListingOffersResponse> responses;
     private List<Error> errors;
 }

@@ -4,7 +4,7 @@ import com.amazonaws.http.HttpMethodName;
 import io.github.dft.amazon.model.AmazonCredentials;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
 import io.github.dft.amazon.model.productprice.GetCompetitivePriceResponse;
-import io.github.dft.amazon.model.productprice.batch.BatchOfferResponseWrappers;
+import io.github.dft.amazon.model.productprice.batch.GetListingOffersBatchResponse;
 import io.github.dft.amazon.model.productprice.batch.BatchOffersRequest;
 import io.github.dft.amazon.model.productprice.listinganditemoffer.GetOffersResponse;
 import lombok.SneakyThrows;
@@ -97,7 +97,7 @@ public class AmazonSPProductPricing extends AmazonSellingPartnerSdk {
         return getRequestWrapped(request, handler);
     }
     
-    public BatchOfferResponseWrappers getItemOffersBatch(BatchOffersRequest batchOffersRequest) {
+    public GetListingOffersBatchResponse getItemOffersBatch(BatchOffersRequest batchOffersRequest) {
         URI uri = URI.create(sellingRegionEndpoint + BATCH_PRODUCTS_PRICING_ITEMS_OFFERS_V0);
 
         final var signRequest = signRequest(String.valueOf(uri), HttpMethodName.POST, null);
@@ -112,15 +112,15 @@ public class AmazonSPProductPricing extends AmazonSellingPartnerSdk {
                                          .POST(HttpRequest.BodyPublishers.ofString(getString(batchOffersRequest)))
                                          .build();
 
-        HttpResponse.BodyHandler<BatchOfferResponseWrappers> handler = new JsonBodyHandler<>(BatchOfferResponseWrappers.class);
+        HttpResponse.BodyHandler<GetListingOffersBatchResponse> handler = new JsonBodyHandler<>(GetListingOffersBatchResponse.class);
         return getRequestWrapped(request, handler);
     }
 
-    public BatchOfferResponseWrappers getListingOffersBatch(BatchOffersRequest batchOffersRequest) {
+    public GetListingOffersBatchResponse getListingOffersBatch(BatchOffersRequest batchOffersRequest) {
         URI uri = URI.create(sellingRegionEndpoint + BATCH_PRODUCTS_PRICING_ITEMS_LISTINGS_V0);
 
         final var signRequest = signRequest(String.valueOf(uri), HttpMethodName.POST, null);
-
+        String payload = getString(batchOffersRequest);
         HttpRequest request = HttpRequest.newBuilder(uri)
                                          .header(HTTP_HEADER_ACCEPTS, HTTP_HEADER_VALUE_APPLICATION_JSON)
                                          .header(HTTP_HEADER_CONTENT_TYPE, HTTP_HEADER_VALUE_APPLICATION_JSON)
@@ -128,10 +128,10 @@ public class AmazonSPProductPricing extends AmazonSellingPartnerSdk {
                                          .header(HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(HTTP_HEADER_AUTHORIZATION))
                                          .header(HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
                                          .header(X_AMZ_DATE, signRequest.getHeaders().get(X_AMZ_DATE))
-                                         .POST(HttpRequest.BodyPublishers.ofString(getString(batchOffersRequest)))
+                                         .POST(HttpRequest.BodyPublishers.ofString(payload))
                                          .build();
 
-        HttpResponse.BodyHandler<BatchOfferResponseWrappers> handler = new JsonBodyHandler<>(BatchOfferResponseWrappers.class);
+        HttpResponse.BodyHandler<GetListingOffersBatchResponse> handler = new JsonBodyHandler<>(GetListingOffersBatchResponse.class);
         return getRequestWrapped(request, handler);
     }
 }
