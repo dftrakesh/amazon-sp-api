@@ -14,4 +14,6 @@ public class Attributes {
 
     private List<ItemValue> fulfillmentAvailability;
     private List<ItemValue> productDescription;
+    private List<ItemValue> itemName;
+    private List<ItemValue> mainProductImageLocator;
 }

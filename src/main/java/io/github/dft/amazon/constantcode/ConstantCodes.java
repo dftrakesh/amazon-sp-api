@@ -38,7 +38,13 @@ public interface ConstantCodes {
     String CATALOG_CATEGORIES_API_V0 = "/catalog/v0/categories";
     String FULFILLMENT_OUTBOUND_API_V202007 = "/fba/outbound/2020-07-01/fulfillmentOrders";
     String FBA_INVENTORY_API_V1 = "/fba/inventory/v1/summaries";
+    String OFFERS_ENDPOINT = "/offers";
+    String PRODUCTS_PRICING_ITEMS_V0 = "/products/pricing/v0/items/";
+    String BATCH_PRODUCTS_PRICING_ITEMS_OFFERS_V0 = "/batches/products/pricing/v0/itemOffers";
+    String BATCH_PRODUCTS_PRICING_ITEMS_LISTINGS_V0 = "/batches/products/pricing/v0/listingOffers";
+    String PRODUCTS_PRICING_LISTINGS_V0 = "/products/pricing/v0/listings/";
     String PRODUCTS_PRICING_COMPETITIVE_PRICE_API_V0 = "/products/pricing/v0/competitivePrice";
+    String PRODUCTS_PRICING_GET_LISTING_OFFERS = "/products/pricing/v0/listings/%s/offers";
     String NOTIFICATION_SUBSCRIPTION_API_V1 = "/notifications/v1/subscriptions";
     String LISTING_ITEMS_V20210801 = "/listings/2021-08-01/items";
     String FORWARD_SLASH = "/";
