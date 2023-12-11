@@ -7,5 +7,6 @@ public class ShippingTime {
 
     private Integer maximumHours;
     private Integer minimumHours;
+    private String availableDate;
     private String availabilityType;
 }
