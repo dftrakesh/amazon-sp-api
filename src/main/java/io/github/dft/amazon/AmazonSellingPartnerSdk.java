@@ -24,6 +24,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -147,6 +148,7 @@ public class AmazonSellingPartnerSdk {
         }
     }
 
+    @SneakyThrows
     protected URI addParameters(URI uri, HashMap<String, String> params) {
         String query = uri.getQuery();
         StringBuilder builder = new StringBuilder();
@@ -155,7 +157,7 @@ public class AmazonSellingPartnerSdk {
             builder.append(query);
 
         for (Map.Entry<String, String> entry : params.entrySet()) {
-            String keyValueParam = entry.getKey() + "=" + entry.getValue();
+            String keyValueParam = entry.getKey() + "=" + URLEncoder.encode(entry.getValue(), UTF_8);
             if (!builder.toString().isEmpty())
                 builder.append("&");
             builder.append(keyValueParam);
