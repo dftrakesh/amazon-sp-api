@@ -49,6 +49,7 @@ public interface ConstantCodes {
     String LISTING_ITEMS_V20210801 = "/listings/2021-08-01/items";
 
     String FULFILLMENT_INBOUND_SHIPMENT_VO_SHIPMENTS = "/fba/inbound/v0/shipments";
+    String FULFILLMENT_INBOUND_SHIPMENT_VO_SHIPMENT_ITEMS = "/fba/inbound/v0/shipments/%s/items";
     String FORWARD_SLASH = "/";
 
     String AWS_REGION_US_EAST_1 = "us-east-1";

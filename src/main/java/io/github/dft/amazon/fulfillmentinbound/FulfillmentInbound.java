@@ -3,10 +3,7 @@ package io.github.dft.amazon.fulfillmentinbound;
 import com.amazonaws.http.HttpMethodName;
 import io.github.dft.amazon.AmazonSellingPartnerSdk;
 import io.github.dft.amazon.constantcode.ConstantCodes;
-import io.github.dft.amazon.fulfillmentinbound.model.GetShipmentsResponse;
-import io.github.dft.amazon.fulfillmentinbound.model.GetShipmentsResult;
-import io.github.dft.amazon.fulfillmentinbound.model.InboundShipmentInfo;
-import io.github.dft.amazon.fulfillmentinbound.model.InboundShipmentList;
+import io.github.dft.amazon.fulfillmentinbound.model.*;
 import io.github.dft.amazon.model.AmazonCredentials;
 import io.github.dft.amazon.model.handler.JsonBodyHandler;
 import io.github.dft.amazon.model.sellersapi.v1.GetMarketplaceParticipationsResponse;
@@ -46,6 +43,25 @@ public class FulfillmentInbound extends AmazonSellingPartnerSdk {
         return getRequestWrapped(request, handler);
     }
 
+    @SneakyThrows
+    public GetShipmentItemsResponse getShipmentItemsByShipmentId(String shipmentId) {
+        String url = String.format(ConstantCodes.FULFILLMENT_INBOUND_SHIPMENT_VO_SHIPMENT_ITEMS, shipmentId);
+        final var signRequest = signRequest(url, HttpMethodName.GET, null);
+
+        URI uri = new URI(sellingRegionEndpoint + url);
+        HttpRequest request = HttpRequest.newBuilder(uri)
+                .header(ConstantCodes.HTTP_HEADER_ACCEPTS, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+                .header(ConstantCodes.HTTP_HEADER_CONTENT_TYPE, ConstantCodes.HTTP_HEADER_VALUE_APPLICATION_JSON)
+                .header(ConstantCodes.HTTP_HEADER_X_AMZ_ACCESS_TOKEN, amazonCredentials.getAccessToken())
+                .header(ConstantCodes.HTTP_HEADER_AUTHORIZATION, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_AUTHORIZATION))
+                .header(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN, signRequest.getHeaders().get(ConstantCodes.HTTP_HEADER_X_AMZ_SECURITY_TOKEN))
+                .header(ConstantCodes.X_AMZ_DATE, signRequest.getHeaders().get(ConstantCodes.X_AMZ_DATE))
+                .build();
+
+        HttpResponse.BodyHandler<GetShipmentItemsResponse> handler = new JsonBodyHandler<>(GetShipmentItemsResponse.class);
+        return getRequestWrapped(request, handler);
+    }
+
 
     @SneakyThrows
     public List<InboundShipmentInfo> getAllShipmentsByStatuses(String statuses) {
@@ -71,4 +87,6 @@ public class FulfillmentInbound extends AmazonSellingPartnerSdk {
         }
         return inboundShipmentInfoList;
     }
+
+
 }
